@@ -1025,16 +1025,43 @@ Ini output terpenting. Buat prompt gambar selevel sinematografer profesional (da
 Aturan:
 1. Scene 1: Deskripsikan karakter, lingkungan, gaya visual (${gayaVisual}) secara lengkap.
 2. Scene 2 dan seterusnya: WAJIB gunakan kalimat pengunci di parameter Character dan Environment, misal: "Use exactly the same teacher, laboratory, lighting, rendering style, classroom layout, clothing, hairstyle, accessories, and environment from Scene 1."
-3. JANGAN menggunakan tabel untuk output ini. Buatlah list mendetail per scene dengan format berikut ini.
+3. JANGAN menggunakan tabel untuk output ini. Buatlah list mendetail per scene dengan format persis berikut ini (TIDAK BOLEH DIUBAH):
 
-Format Wajib per Scene:
+====================================
+SCENE [Nomor Scene]
+Purpose: [Tujuan adegan ini]
+Aspect Ratio: [${ratio}]
+Resolution: [${resolusi}]
+Visual Style: [${gayaVisual}]
+Composition: [Aturan sepertiga, framing, dsb]
+Character: [Deskripsi karakter, jika "No Character" tulis N/A]
+Environment: [Deskripsi lokasi/background]
+Action: [Apa yang terjadi di scene ini]
+Educational Focus: [Fokus elemen pembelajaran]
+Camera: [Sudut dan jenis lensa]
+Lighting: [Pencahayaan]
+Color Palette: [Warna dominan]
+Mood: [${suasana}]
+Rendering Quality: [Ultra-detailed, 8k, cinematic, dsb]
+Animation Readiness: [Kesiapan untuk dianimasikan]
+Leave Empty Space: [Area kosong untuk grafis/teks pembelajaran nanti]
+Negative Prompt: [Hal-hal yang tidak boleh ada di gambar]
+Final Prompt: [Gabungan semua elemen di atas menjadi SATU PARAGRAF prompt utuh siap pakai (Bahasa Inggris)]
+====================================
+
+=====================================================
+# OUTPUT 3 ⭐⭐⭐⭐⭐
+PROMPT VIDEO
+Prompt video untuk mengubah gambar menjadi pengalaman belajar.
+Format Wajib per Scene (dalam Bahasa Inggris, KECUALI Dialogue):
+
 ====================================
 SCENE [Nomor Scene]
 Objective: [Tujuan pembelajaran atau pesan utama scene ini]
 Visual: [Instruksi detail pergerakan objek/karakter secara sinematik dan jelas]
 Camera: [Pergerakan kamera, mis. slow zoom in, pan right, static, cinematic tracking]
 Scientific visualization: [Efek visual sains jika diperlukan. Tulis "None" jika tidak ada]
-Educational graphics: [Grafis pop-up pembelajaran. Tulis "None" jika tidak ada]
+Educational graphics: [Grafis pop-up pembelajaran (keyword, panah, diagram). Tulis "None" jika tidak ada]
 Sound Design: [${soundDesignInstruction}]
 Dialogue: [${dialogInstruction}]
 Transition: [Transisi dari scene sebelumnya, mis. cut, fade in, match cut]
