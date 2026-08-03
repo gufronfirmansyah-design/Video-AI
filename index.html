@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Generator Prompt Video Pembelajaran V 2.0</title>
+<title>Generator Prompt Video Pembelajaran V7.8</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -442,6 +442,7 @@
       <p>Masukkan gambar yang sudah Anda simpan ke alat pembuat video AI. Salin instruksi dari Output 3 (Prompt Video) dan masukkan sebagai prompt agar video bergerak sesuai skenario edukasi.<br><b>Rekomendasi AI Video:</b></p>
       <ul>
         <li><a href="https://deepmind.google/technologies/veo/" target="_blank">Gemini Video (Veo)</a> / <a href="https://workspace.google.com/products/vids/" target="_blank">Google Vids</a></li>
+        <li><a href="https://cloud.google.com/vertex-ai" target="_blank">Google Flow</a> (Vertex AI)</li>
         <li><a href="https://klingai.com/" target="_blank">Kling AI</a> (Sangat bagus untuk pergerakan realistis)</li>
         <li><a href="https://runwayml.com/" target="_blank">Runway Gen-3</a> atau <a href="https://lumalabs.ai/dream-machine" target="_blank">Luma Dream Machine</a></li>
       </ul>
@@ -821,9 +822,11 @@
     }
     updateCount();
   }
+  
+  // Attach events AFTER functions are defined
   audioVoice.addEventListener('change', syncAudioLogic);
   suaraEl.addEventListener('change', syncAudioLogic);
-  syncAudioLogic();
+  syncAudioLogic(); // run once on load
 
   document.querySelectorAll('input, textarea, select').forEach(el=>{
     el.addEventListener('input', updateCount);
@@ -1034,17 +1037,30 @@ Seluruh keputusan visual, sinematografi, animasi, dan efek pembelajaran harus se
 
 =====================================================
 
+## PRIORITAS INSTRUKSI
+Selalu patuhi urutan prioritas berikut:
+1. Konsep Video (prioritas tertinggi)
+2. Tujuan Pembelajaran
+3. Storyboard
+4. Konsistensi Antar Scene
+5. Kreativitas Sutradara
+
+Jika terjadi konflik, selalu ikuti prioritas di atas.
+
+=====================================================
+
 ## OUTPUT 1
 STORYBOARD
 Ini adalah "master" semuanya.
 
 ATURAN MUTLAK STORYBOARD:
-1. Durasi setiap scene dikunci pada 8 detik.
-2. Narasi/Dialog WAJIB dibatasi MAKSIMAL 15 - 20 kata per scene! Jika kalimat narasi terlalu panjang, Anda wajib memecahnya ke scene berikutnya. JANGAN pernah memberikan paragraf panjang di satu scene.
+1. Scene pertama WAJIB menjadi VISUAL HOOK. Buat siswa penasaran dalam 3 detik pertama dengan visual yang menarik sebelum penjelasan dimulai.
+2. Durasi setiap scene dikunci pada 8 detik.
+3. Narasi/Dialog WAJIB dibatasi MAKSIMAL 15 - 20 kata per scene! Jika kalimat narasi terlalu panjang, Anda wajib memecahnya ke scene berikutnya.
 
 Buatkan tabel persis seperti format ini:
 
-| Scene | Durasi | Visual | Narasi/Dialog |
+| Scene | Durasi | Visual | Narasi/Dialog | Transisi |
 
 Lanjutkan langsung ke tahap berikutnya tanpa berhenti.
 
@@ -1052,67 +1068,27 @@ Lanjutkan langsung ke tahap berikutnya tanpa berhenti.
 
 ## OUTPUT 2
 PROMPT IMAGE
-Ini output terpenting. Buat prompt gambar selevel sinematografer, bukan sekadar prompt biasa.
-TIDAK BOLEH MENGGUNAKAN TABEL. WAJIB gunakan format text block ini untuk setiap scene:
+Ini output terpenting. Buat prompt gambar selevel sinematografer.
+TIDAK BOLEH MENGGUNAKAN TABEL. 
+PENTING: Anda harus memikirkan Camera Angle, Lighting, Visual Hierarchy, dan Educational Composition secara mendalam di belakang layar, tetapi TIDAK PERLU menuliskannya sebagai output terpisah agar tidak terlalu panjang bagi guru. Langsung gabungkan semuanya ke dalam Final Prompt.
+
+Gunakan format text block ini untuk setiap scene:
 
 ====================================
-
 SCENE [Nomor Scene]
 
-Purpose
+Purpose:
 [Tujuan edukasi dari gambar ini]
 
-Aspect Ratio
+Aspect Ratio:
 [${ratio}]
 
-Resolution
+Resolution:
 [${resolusi}]
 
-Visual Style
-[${gayaVisual}, ${jenisAnimasi}]
-
-Composition
-[Aturan thirds, framing, angle kamera]
-
-Character
-[Deskripsi fisik, pakaian, ekspresi karakter jika ada]
-
-Environment
-[Deskripsi lokasi, properti, cuaca/waktu]
-
-Action
-[Apa yang terjadi di frame ini]
-
-Educational Focus
-[Fokus ke objek apa untuk pembelajaran]
-
-Camera
-[Tipe lensa, pergerakan kamera tersirat]
-
-Lighting
-[Arah, temperatur, gaya cahaya]
-
-Color Palette
-[Warna dominan]
-
-Mood
-[${suasana}, ${emosi}]
-
-Rendering Quality
-[Kualitas render, misal 8k, unreal engine 5, masterpiece]
-
-Animation Readiness
-[Bersih, siap dianimasikan]
-
-Leave Empty Space
-[Instruksi menyisakan ruang kosong untuk pop-up/teks]
-
-Negative Prompt
-[Hal-hal yang tidak boleh muncul, misal teks berantakan, tangan cacat]
-
-Final Prompt
-[Tuliskan SATU paragraf prompt bahasa inggris yang MENGGABUNGKAN semua poin di atas. Prompt ini yang akan saya copy ke AI Image Generator.]
-
+Final Prompt:
+[Tuliskan SATU paragraf prompt bahasa inggris yang MENGGABUNGKAN Visual Style, Action, Camera, Lighting, Educational Composition, ruang kosong (empty space), dan Visual Hierarchy.
+ATURAN KONSISTENSI (Otomatis tambahkan kalimat ini di bagian akhir Final Prompt untuk Scene 2 dan seterusnya): "Use EXACTLY the same character, same clothing, same environment, same lighting, same rendering style, same facial features, same camera language, and same composition style as the previous scene. Only change the action."]
 ====================================
 
 Lanjutkan langsung ke tahap berikutnya tanpa berhenti.
@@ -1125,12 +1101,10 @@ Gunakan format ini untuk menganimasikan gambar dari Output 2.
 TIDAK BOLEH MENGGUNAKAN TABEL. WAJIB gunakan format text block ini untuk setiap scene:
 
 ====================================
-
 SCENE [Nomor Scene]
 
-Reference:
-Use Scene [Nomor Scene] image as the first frame.
-Maintain identical character, environment, lighting, rendering style, clothing, and color palette.
+Opening Frame:
+Use the generated image from Scene [Nomor Scene] as the exact opening frame. Do not redesign anything. Only animate naturally. Maintain complete visual consistency.
 
 Learning Goal:
 [Tujuan adegan]
@@ -1138,8 +1112,8 @@ Learning Goal:
 Scene Action:
 [Aksi sesuai storyboard]
 
-Director's Freedom:
-You are directing an educational movie. Use visual storytelling. Add educational pop-up graphics, labels, arrows, highlights, scientific visualization, camera movement, transitions, and emphasis animations whenever they improve learning. IMPORTANT: All on-screen text, labels, and pop-ups MUST be written in ${bahasa.toUpperCase()}.
+Educational Enhancement:
+Whenever it helps students understand, freely add: animated labels, arrows, infographics, comparisons, process visualization, cross-section views, highlighted keywords, or animated icons. Do not overuse. Only use when they improve learning. IMPORTANT: All educational text must be in ${bahasa.toUpperCase()}.
 
 Dialogue:
 ${dialogInstruction}
@@ -1147,12 +1121,14 @@ ${dialogInstruction}
 Sound Design:
 ${soundDesignInstruction}
 
+Director Notes:
+[Jelaskan fokus utama visual edukasi di scene ini agar efek visual AI tidak mengganggu konsep belajar. Contoh: "Students must clearly see the oxygen entering the lungs. The lungs should remain the visual focus."]
+
 Technical:
 Duration: 8 seconds
 Aspect Ratio: [${ratio}]
 Resolution: [${resolusi}]
 Animation Style: [${jenisAnimasi}]
-
 ====================================
 
 =====================================================
@@ -1204,11 +1180,12 @@ PENTING: Pastikan semua teks yang muncul di layar (pop-up, label, diagram, penje
       document.execCommand('copy');
       document.body.removeChild(ta);
       copyBtn.textContent = '✅ Tersalin!';
-      setTimeout(()=>{ copyBtn.textContent = '📋 Salin'; }, 1600);
+      copyBtn.classList.add('copied');
+      setTimeout(()=>{ copyBtn.textContent = '📋 Salin'; copyBtn.classList.remove('copied'); }, 1600);
     }
   });
 
-  downloadBtn.addEventListener('click', ()=>{
+  function downloadBtnClick(){
     if(output.style.display === 'none'){ btn.click(); }
     const text = output.textContent;
     if(!text) return;
@@ -1221,9 +1198,10 @@ PENTING: Pastikan semua teks yang muncul di layar (pop-up, label, diagram, penje
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(a.href);
-  });
+  }
+  downloadBtn.addEventListener('click', downloadBtnClick);
 
-  function buildWorkbook(){
+  function buildWorkbook(promptText){
     const rows = {
       judul: textVal('judul'), mapel: textVal('mapel'), jenjang: selVal('jenjang'),
       bahasa: selVal('bahasa'),
@@ -1252,8 +1230,14 @@ PENTING: Pastikan semua teks yang muncul di layar (pop-up, label, diagram, penje
       return arr;
     }
 
-    // Sheet 1 — Konsep Video
-    addSheet('1. Konsep Video', [
+    // Sheet 1 — Master Prompt (Dikunci di 1 Cell)
+    addSheet('1. Master Prompt', [
+      ['TIPS: Klik 2x (double-click) pada cell di bawah ini untuk menyorot seluruh teks, lalu tekan Ctrl+C (Copy). Paste (Ctrl+V) ke ChatGPT / Gemini.'],
+      [promptText]
+    ], [150]);
+
+    // Sheet 2 — Konsep Video
+    addSheet('2. Konsep Video', [
       ['Komponen','Isi'],
       ['Judul Video', rows.judul],
       ['Mata Pelajaran', rows.mapel],
@@ -1275,20 +1259,20 @@ PENTING: Pastikan semua teks yang muncul di layar (pop-up, label, diagram, penje
       ['Lokasi Cerita', rows.lokasi]
     ], [26, 60]);
 
-    // Sheet 2 — Storyboard
-    addSheet('2. Storyboard', [
-      ['Scene','Durasi','Visual (tempel dari AI)','Narasi / Dialog'],
-      ...blankRows(15, 4)
-    ], [8, 10, 45, 45]);
+    // Sheet 3 — Storyboard
+    addSheet('3. Storyboard', [
+      ['Scene','Durasi','Visual (tempel dari AI)','Narasi / Dialog','Transisi'],
+      ...blankRows(15, 5)
+    ], [8, 10, 45, 45, 15]);
 
-    // Sheet 3 — Prompt Image
-    addSheet('3. Prompt Image', [
+    // Sheet 4 — Prompt Image
+    addSheet('4. Prompt Image', [
       ['Scene','Final Prompt Image (tempel dari AI, copy bagian FINAL PROMPT saja)'],
       ...blankRows(15, 2)
     ], [8, 120]);
 
-    // Sheet 4 — Prompt Video
-    addSheet('4. Prompt Video', [
+    // Sheet 5 — Prompt Video
+    addSheet('5. Prompt Video', [
       ['Scene','Prompt Video Keseluruhan (copy dari blok Scene)'],
       ...blankRows(15, 2)
     ], [8, 120]);
@@ -1301,7 +1285,8 @@ PENTING: Pastikan semua teks yang muncul di layar (pop-up, label, diagram, penje
     if(output.style.display === 'none'){ btn.click(); }
     const originalLabel = excelBtn.textContent;
     try{
-      const { wb, judulSlug } = buildWorkbook();
+      const text = output.textContent; // Mengambil teks Master Prompt
+      const { wb, judulSlug } = buildWorkbook(text); // Memasukkannya ke dalam Excel
       XLSX.writeFile(wb, `template-video-${judulSlug}.xlsx`);
       excelBtn.textContent = '✅ Terunduh!';
     }catch(e){
