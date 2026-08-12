@@ -41,7 +41,6 @@
   a{color:var(--teal); text-decoration:none;}
   a:hover{text-decoration:underline;}
 
-  /* ===== Header / slate ===== */
   .slate{
     position:relative;
     overflow:hidden;
@@ -117,7 +116,6 @@
   .take-counter b{color:var(--gold); font-weight:600;}
   .take-dot{width:7px;height:7px;border-radius:50%;background:var(--red);box-shadow:0 0 8px var(--red);}
 
-  /* ===== Layout ===== */
   .wrap{
     max-width:1180px;
     margin:0 auto;
@@ -224,7 +222,6 @@
   @media (max-width:560px){.row2{grid-template-columns:1fr;}}
   .hint{font-size:11.5px; color:rgba(243,239,228,0.4); margin-top:5px;}
 
-  /* ===== Generate button ===== */
   .action-bar{
     position:sticky;
     bottom:16px;
@@ -256,7 +253,6 @@
   .btn-generate:active{transform:translateY(1px);}
   .clap-icon{font-size:19px;}
 
-  /* ===== Output panel ===== */
   .output-col{position:sticky; top:20px;}
   .output-panel{
     background:var(--panel);
@@ -337,7 +333,6 @@
     margin-top:12px;
   }
 
-  /* ===== Modal Tutorial ===== */
   .modal-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -422,7 +417,6 @@
 </head>
 <body>
 
-<!-- Tutorial Modal -->
 <div class="modal-overlay" id="tutorialModal">
   <div class="modal-content">
     <button class="modal-close" id="closeTutorial">&times;</button>
@@ -442,10 +436,10 @@
       <h3><span>3</span> Animasi Video (Image-to-Video)</h3>
       <p>Masukkan gambar yang sudah Anda simpan ke alat pembuat video AI. Salin instruksi dari Output 3 (Prompt Video) dan masukkan sebagai prompt agar video bergerak sesuai skenario edukasi.<br><b>Rekomendasi AI Video:</b></p>
       <ul>
-        <li><a href="https://deepmind.google/technologies/veo/" target="_blank">Gemini Video (Veo)</a> / <a href="https://workspace.google.com/products/vids/" target="_blank">Google Vids</a></li>
-        <li><a href="https://cloud.google.com/vertex-ai" target="_blank">Google Flow</a> (Vertex AI)</li>
+        <li><a href="https://deepmind.google/technologies/veo/" target="_blank">Gemini Video (Veo)</a> / <a href="https://cloud.google.com/vertex-ai" target="_blank">Google Flow</a></li>
         <li><a href="https://klingai.com/" target="_blank">Kling AI</a> (Sangat bagus untuk pergerakan realistis)</li>
         <li><a href="https://runwayml.com/" target="_blank">Runway Gen-3</a> atau <a href="https://lumalabs.ai/dream-machine" target="_blank">Luma Dream Machine</a></li>
+        <li><a href="https://workspace.google.com/products/vids/" target="_blank">Google Vids</a></li>
       </ul>
     </div>
 
@@ -851,7 +845,7 @@
       karakterCustomGroup.style.display = 'block';
     } else {
       karakterCustomGroup.style.display = 'none';
-      useRefImage.checked = false; // reset check
+      useRefImage.checked = false;
       refImageNote.style.display = 'none';
     }
     updateCount();
@@ -915,14 +909,14 @@
     let refImageAlert = "";
     let imageRuleAddon = "";
     let konsistensiChecklist = `✔ karakter\n✔ wajah\n✔ pakaian\n✔ lingkungan\n✔ pencahayaan\n✔ warna\n✔ rendering\n✔ kualitas visual`;
-    let imageConsistencyRule = `ATURAN KONSISTENSI (Otomatis tambahkan kalimat ini di bagian akhir Final Prompt untuk Scene 2 dan seterusnya): "Use EXACTLY the same character, same clothing, same environment, same lighting, same rendering style, same facial features, same camera language, and same composition style as the previous scene. Only change the action."`;
-    let videoConsistencyRule = `Maintain identical character, environment, lighting, rendering style, clothing, and color palette.`;
+    
+    // Motion Continuity adjustments for characters
+    let imageConsistencyRule = `ATURAN KONSISTENSI (Otomatis tambahkan kalimat ini di bagian akhir Final Prompt untuk Scene 2 dan seterusnya): "The composition must be suitable as a continuation of the previous scene's final hold frame. Use EXACTLY the same character, same clothing, same environment, same lighting, same rendering style, same facial features, same camera language, and same composition style as the previous scene whenever the story allows. Avoid unnecessary repositioning of the character or major objects. Only change the action."`;
 
     if (optKar === "none") {
       characterInstruction = "TIDAK ADA KARAKTER DI LAYAR. Fokus video hanya pada lingkungan, visualisasi objek, teks, atau B-roll infografis.";
       konsistensiChecklist = `✔ lingkungan\n✔ objek materi\n✔ pencahayaan\n✔ warna\n✔ rendering\n✔ kualitas visual\n(TIDAK ADA KARAKTER)`;
-      imageConsistencyRule = `ATURAN KONSISTENSI (Otomatis tambahkan kalimat ini di bagian akhir Final Prompt untuk Scene 2 dan seterusnya): "Maintain identical environment, identical objects, same lighting, same rendering style, same camera language, and same composition style as the previous scene. Only change the active motion/camera angle."`;
-      videoConsistencyRule = `Maintain identical environment, objects, lighting, rendering style, and color palette. No character.`;
+      imageConsistencyRule = `ATURAN KONSISTENSI (Otomatis tambahkan kalimat ini di bagian akhir Final Prompt untuk Scene 2 dan seterusnya): "The composition must be suitable as a continuation of the previous scene's final hold frame. Maintain identical environment, identical objects, same lighting, same rendering style, same camera language, and same composition style as the previous scene. Only change the active motion/camera angle."`;
     } else if (optKar === "ai") {
       characterInstruction = "Diserahkan sepenuhnya ke AI untuk merancang karakter (gender, usia, pakaian) yang paling cocok dengan target penonton dan konteks materi.";
     } else {
@@ -947,7 +941,7 @@
     if(useSFX) audioConfig.push("Sound Effects (SFX)");
     
     let isAIVoice = false;
-    let dialogInstruction = "No dialogue. No audio.";
+    let dialogInstructionForNewFormat = "No dialogue.\nNo voice.\nNo lip sync.";
     let soundDesignInstruction = "None.";
     
     if (useVoice) {
@@ -955,7 +949,7 @@
       isAIVoice = suaraText.indexOf('AI') === 0;
       audioConfig.push(`Narasi: ${suaraText}`);
       if (isAIVoice) {
-         dialogInstruction = `[Otomatis diisi dialog narasi lengkap dari storyboard]`;
+         dialogInstructionForNewFormat = `The character says naturally in Indonesian:\n"[Dialogue from Storyboard]"\nNatural Indonesian pronunciation.\nAppropriate emotion and expression.\nPerfect lip synchronization.\nThe dialogue must fit naturally within the scene duration.`;
       }
     }
     const audioString = audioConfig.length > 0 ? audioConfig.join(" + ") : "Visual saja, tanpa audio";
@@ -992,80 +986,71 @@ Video harus mampu:
 ## KEBEBASAN SUTRADARA
 Dalam membuat Prompt Image maupun Prompt Video, Anda WAJIB berpikir sebagai sutradara profesional.
 Anda BOLEH menentukan sendiri apabila dianggap membuat pembelajaran menjadi lebih baik:
-• komposisi gambar
-• posisi karakter
-• ekspresi karakter
-• gesture
-• properti
-• sudut kamera
-• pergerakan kamera
-• cinematic shot
-• close up
-• wide shot
-• zoom
-• dolly
-• tracking
-• lighting
-• efek visual
-• efek ilmiah
-• animasi objek
-• pop-up ilustrasi
-• pop-up keyword
-• pop-up icon
-• pop-up diagram
-• pop-up panah
-• callout
-• highlight
-• transition
-• motion graphic
-• visual emphasis
-• infographic animation
-• visual comparison
-• split screen
-• cutaway
-• insert shot
-• demonstrasi
-• eksperimen
-• visual storytelling
+• komposisi gambar, posisi karakter, ekspresi, gesture, properti
+• sudut kamera, pergerakan kamera, cinematic shot, close up, wide shot, zoom, dolly
+• lighting, efek visual, efek ilmiah, animasi objek
+• pop-up ilustrasi, keyword, icon, diagram, panah, callout, highlight
+• transition, motion graphic, visual emphasis, infographic animation, split screen
 Selama mendukung pembelajaran.
 =====================================================
 ## PRINSIP PEMBELAJARAN
 Selalu gunakan prinsip berikut.
-1.
-SHOW FIRST
-Tampilkan konsep secara visual terlebih dahulu.
-Baru kemudian dijelaskan melalui narasi.
------------------------------------------------------
-2.
-LEARNING BY SEEING
-Siswa harus memahami materi bahkan sebelum narasi selesai.
------------------------------------------------------
-3.
-VISUAL IS THE TEACHER
-Visual menjadi guru utama.
-Narasi hanya memperkuat visual.
------------------------------------------------------
-4.
-ONE SCENE ONE IDEA
-Satu scene hanya menjelaskan satu konsep.
------------------------------------------------------
-5.
-VISUAL HIERARCHY
-Objek terpenting harus langsung menarik perhatian siswa.
+1. SHOW FIRST: Tampilkan konsep secara visual terlebih dahulu. Baru dijelaskan narasi.
+2. LEARNING BY SEEING: Siswa harus memahami materi bahkan sebelum narasi selesai.
+3. VISUAL IS THE TEACHER: Visual menjadi guru utama. Narasi hanya memperkuat.
+4. ONE SCENE ONE IDEA: Satu scene hanya menjelaskan satu konsep.
+5. VISUAL HIERARCHY: Objek terpenting harus langsung menarik perhatian siswa.
+=====================================================
+## PROMPT IMAGE
+Prompt Image bukan sekadar menghasilkan gambar yang indah.
+Prompt Image harus menghasilkan gambar yang:
+✔ sinematik
+✔ edukatif
+✔ mudah dipahami siswa
+✔ memiliki ruang kosong yang cukup untuk pop-up pembelajaran
+✔ memiliki fokus visual yang jelas
+✔ tidak terlalu ramai
+✔ mudah dianimasikan menjadi video
+=====================================================
+## PROMPT VIDEO
+Prompt Video bukan hanya menggerakkan gambar.
+Prompt Video harus mengubah gambar menjadi pengalaman belajar.
+AI BOLEH secara otomatis menambahkan apabila diperlukan:
+✔ pop-up keyword, animated label, callout, diagram, panah
+✔ zoom, highlight, glow, visual comparison, scientific visualization
+✔ infographic animation, icon animation, transition, emphasis animation, demonstrasi
+tanpa harus diminta satu per satu.
 =====================================================
 ## KONSISTENSI
 Semua scene WAJIB mempertahankan:
 ${konsistensiChecklist}
 Scene berikutnya adalah kelanjutan langsung dari scene sebelumnya.
 =====================================================
+## MOTION CONTINUITY
+Setiap scene harus memiliki hubungan gerak yang jelas dengan scene berikutnya.
+Setiap scene memiliki tiga fase:
+1. STILL START: Scene dimulai dengan kondisi visual yang stabil berdasarkan gambar referensi.
+2. MAIN ACTION: Gerakan utama terjadi secara natural dan bertahap.
+3. MOTION HOLD: Gerakan secara perlahan berhenti sebelum scene berakhir.
+
+Aturan:
+- Scene berikutnya WAJIB dimulai dari kondisi visual yang stabil.
+- Jangan memulai scene baru dengan karakter atau objek yang tiba-tiba sudah bergerak.
+- Jangan memulai scene baru dari pose yang berbeda jauh dari ending scene sebelumnya.
+- Jangan membuat gerakan yang terputus.
+- Prioritaskan continuity daripada jumlah gerakan.
+- Setiap scene harus dapat dipotong dan disambungkan secara halus di video editor.
+=====================================================
+## TUJUAN AKHIR
+Target akhir bukan menghasilkan prompt.
+Target akhir adalah menghasilkan video pembelajaran yang apabila ditonton siswa terasa seperti film animasi edukasi modern yang menarik, interaktif, dan mudah dipahami.
+=====================================================
 ## ADAPTIVE GENERATION
 Sesuaikan seluruh storyboard, prompt image, dan prompt video berdasarkan pilihan pengguna pada generator.
 Contoh:
 - Jika pengguna memilih "Kartun 3D Modern", gunakan gaya visual kartun 3D modern secara konsisten.
-- Jika pengguna memilih "Film Dokumenter", gunakan gaya dokumenter sinematik.
-- Jika pengguna memilih "Discovery Learning", buat adegan yang membangun rasa ingin tahu.
-- Jika pengguna memilih "Guru mengisi suara sendiri", jangan sertakan dialog pada Prompt Video.
-- Jika pengguna memilih "Suara dibuat AI", sertakan dialog pada Prompt Video.
+- Jika pengguna memilih "Discovery Learning", buat adegan yang membangun rasa ingin tahu dan mengajak siswa mengamati sebelum memberikan penjelasan.
+- Jika pengguna memilih "Storytelling", susun adegan seperti alur cerita yang menarik.
 Seluruh keputusan visual, sinematografi, animasi, dan efek pembelajaran harus selalu mengikuti pilihan yang diisi pengguna pada Generator.
 
 =====================================================
@@ -1103,7 +1088,6 @@ Selalu patuhi urutan prioritas berikut:
 3. Storyboard
 4. Konsistensi Antar Scene
 5. Kreativitas Sutradara
-
 Jika terjadi konflik, selalu ikuti prioritas di atas.
 
 =====================================================
@@ -1127,8 +1111,8 @@ Lanjutkan langsung ke tahap berikutnya tanpa berhenti.
 
 ## OUTPUT 2
 PROMPT IMAGE
-Ini output terpenting. Buat prompt gambar selevel sinematografer. Berpikir selengkap mungkin di belakang layar, tetapi JANGAN MENAMPILKAN detail seperti Mood, Color Palette, atau Rendering Quality di output akhir agar prompt guru tetap rapi dan ringkas.
 TIDAK BOLEH MENGGUNAKAN TABEL.${imageRuleAddon}
+AI berpikir selengkap mungkin di belakang layar (Color Palette, Mood, Lighting, dll) tetapi yang ditampilkan sebagai output HANYA format blok di bawah ini.
 
 Gunakan format text block ini untuk setiap scene:
 
@@ -1155,38 +1139,85 @@ Lanjutkan langsung ke tahap berikutnya tanpa berhenti.
 
 ## OUTPUT 3
 PROMPT VIDEO
-Gunakan format ini untuk menganimasikan gambar dari Output 2. 
 TIDAK BOLEH MENGGUNAKAN TABEL. WAJIB gunakan format text block ini untuk setiap scene:
 
 ====================================
 SCENE [Nomor Scene]
 
 Opening Frame:
-Use the generated image from Scene [Nomor Scene] as the exact opening frame. Do not redesign anything. Only animate naturally. ${videoConsistencyRule}
+Use the generated image from Scene [Nomor Scene] as the exact opening frame.
+Start with a stable and natural composition.
+For the first approximately 1 second, keep the main character and important objects relatively still.
+Do not begin with sudden movement.
+Do not redesign, reposition, or transform the character or environment.
+Maintain complete visual consistency with the reference image.
 
 Learning Goal:
 [Tujuan adegan]
 
 Scene Action:
 [Aksi sesuai storyboard]
+Animate the action naturally and gradually.
+Avoid sudden or excessive movements.
+All movements must support the learning objective.
 
-Director's Freedom:
-You are directing an educational movie. Use visual storytelling. Add educational pop-up graphics, labels, arrows, highlights, scientific visualization, camera movement, transitions, and emphasis animations whenever they improve learning. IMPORTANT: All on-screen text, labels, and pop-ups MUST be written in ${bahasa.toUpperCase()}!
+Educational Enhancement:
+Whenever it helps students understand, freely add:
+- animated labels
+- arrows
+- infographics
+- comparisons
+- process visualization
+- cross-section views
+- highlighted keywords
+- animated icons
+- visual emphasis
+Do not overuse visual effects. Only use effects when they improve learning.
+IMPORTANT: All educational text, labels, keywords, diagrams, and pop-ups MUST be written in ${bahasa.toUpperCase()}.
+
+Motion Continuity:
+IMPORTANT: The scene must end in a stable visual state.
+During the final approximately 1.5 seconds, gradually reduce all character and object movement.
+Slowly settle the movement. Avoid abrupt stops.
+At the end of the scene:
+- the main character must hold a natural pose
+- important objects must remain still
+- camera movement must gradually stop
+- visual effects must settle
+- particles and secondary animations must slow down or stop
+- no new action should begin
+- no character should be walking, jumping, turning, or making a large gesture
+- no object should be moving rapidly
+Create a clean final HOLD FRAME.
+The final frame should remain visually stable and suitable to connect seamlessly with the next scene.
+The ending position must be natural and easy to continue from in the next scene.
+
+Transition Preparation:
+The final frame of this scene must be treated as a visual handoff point for the next scene.
+Do not create a dramatic transition inside the generated video.
+Do not fade to black unless explicitly requested.
+Do not add a sudden camera cut at the end.
+End with a clean, stable composition.
+The next scene should begin from this visual state whenever possible.
 
 Dialogue:
-${dialogInstruction}
+${dialogInstructionForNewFormat}
 
 Sound Design:
 ${soundDesignInstruction}
 
 Director Notes:
-[Fokus utama AI. Contoh: "The educational emphasis of this scene is: students must clearly see that oxygen enters the lungs. Do not let visual effects distract from the concept. The lungs should remain the visual focus throughout the scene."]
+[Fokus utama visual edukasi]
+The visual effects must never distract from the main learning concept.
 
 Technical:
 Duration: 8 seconds
 Aspect Ratio: [${ratio}]
 Resolution: [${resolusi}]
 Animation Style: [${jenisAnimasi}]
+Smooth motion.
+Natural movement.
+Stable final frame.
 ====================================
 
 =====================================================
@@ -1216,7 +1247,6 @@ PENTING: Pastikan semua teks pop-up layar yang diperintahkan WAJIB DITULIS DALAM
       btn.innerHTML = '<span class="clap-icon">🎬</span> Buat Master Prompt';
     }, 1400);
     
-    // Auto-scroll
     document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
     document.getElementById('scriptPaper').scrollTop = 0;
   });
