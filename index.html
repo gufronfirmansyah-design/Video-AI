@@ -1,583 +1,688 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Generator Prompt Video Pembelajaran</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg-0:#12142b;
-    --bg-1:#191c3a;
-    --panel:#20244a;
-    --panel-2:#262b57;
-    --line: rgba(240,169,62,0.16);
-    --line-soft: rgba(255,255,255,0.08);
-    --cream:#f3efe4;
-    --cream-dim: rgba(243,239,228,0.62);
-    --gold:#f0a93e;
-    --gold-dim: rgba(240,169,62,0.35);
-    --teal:#57c2b6;
-    --red:#e2574c;
-    --radius:14px;
-    --serif-display:'Anton', sans-serif;
-    --sans:'Space Grotesk', sans-serif;
-    --mono:'JetBrains Mono', monospace;
-  }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;scroll-behavior:smooth;}
-  body{
-    background:
-      radial-gradient(1200px 600px at 15% -10%, rgba(240,169,62,0.10), transparent 60%),
-      radial-gradient(900px 500px at 100% 0%, rgba(87,194,182,0.08), transparent 55%),
-      var(--bg-0);
-    color:var(--cream);
-    font-family:var(--sans);
-    min-height:100vh;
-    line-height:1.5;
-  }
-  a{color:var(--teal); text-decoration:none;}
-  a:hover{text-decoration:underline;}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generator Prompt Video Pembelajaran (Chain of Prompting)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    :root{
+      --bg-0:#12142b;
+      --bg-1:#191c3a;
+      --panel:#20244a;
+      --panel-2:#262b57;
+      --line: rgba(240,169,62,0.16);
+      --line-soft: rgba(255,255,255,0.08);
+      --cream:#f3efe4;
+      --cream-dim: rgba(243,239,228,0.62);
+      --gold:#f0a93e;
+      --gold-dim: rgba(240,169,62,0.35);
+      --teal:#57c2b6;
+      --red:#e2574c;
+      --red-bg: rgba(226, 87, 76, 0.15);
+      --radius:14px;
+      --serif-display:'Anton', sans-serif;
+      --sans:'Space Grotesk', sans-serif;
+      --mono:'JetBrains Mono', monospace;
+    }
+    *{box-sizing:border-box;}
+    html,body{margin:0;padding:0;scroll-behavior:smooth;}
+    body{
+      background:
+        radial-gradient(1200px 600px at 15% -10%, rgba(240,169,62,0.10), transparent 60%),
+        radial-gradient(900px 500px at 100% 0%, rgba(87,194,182,0.08), transparent 55%),
+        var(--bg-0);
+      color:var(--cream);
+      font-family:var(--sans);
+      min-height:100vh;
+      line-height:1.5;
+    }
+    a{color:var(--teal); text-decoration:none;}
+    a:hover{text-decoration:underline;}
 
-  .slate{
-    position:relative;
-    overflow:hidden;
-    border-bottom:1px solid var(--line);
-    background:var(--bg-1);
-  }
-  .slate-stripes{
-    height:14px;
-    width:100%;
-    background:repeating-linear-gradient(-35deg, var(--cream) 0 26px, #1a1d3d 26px 52px);
-    opacity:0.9;
-  }
-  .slate-inner{
-    max-width:1180px;
-    margin:0 auto;
-    padding:36px 28px 30px;
-    display:flex;
-    align-items:flex-end;
-    justify-content:space-between;
-    gap:24px;
-    flex-wrap:wrap;
-  }
-  .slate-eyebrow{
-    font-family:var(--mono);
-    font-size:12px;
-    letter-spacing:0.16em;
-    color:var(--gold);
-    text-transform:uppercase;
-    margin:0 0 10px;
-  }
-  h1.slate-title{
-    font-family:var(--serif-display);
-    font-weight:400;
-    font-size:clamp(28px,4.4vw,46px);
-    letter-spacing:0.01em;
-    margin:0;
-    line-height:1.02;
-    text-transform:uppercase;
-  }
-  .slate-title .accent{color:var(--gold);}
-  .slate-sub{
-    max-width:520px;
-    color:var(--cream-dim);
-    font-size:14.5px;
-    margin-top:10px;
-  }
-  .btn-tutor {
-    display: inline-block;
-    margin-top: 14px;
-    background: rgba(240,169,62,0.15);
-    color: var(--gold);
-    border: 1px solid var(--gold-dim);
-    padding: 6px 14px;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-  .btn-tutor:hover { background: rgba(240,169,62,0.25); }
-  .take-counter{
-    font-family:var(--mono);
-    font-size:12px;
-    color:var(--cream-dim);
-    border:1px solid var(--line);
-    border-radius:999px;
-    padding:8px 16px;
-    display:flex;
-    align-items:center;
-    gap:8px;
-    white-space:nowrap;
-  }
-  .take-counter b{color:var(--gold); font-weight:600;}
-  .take-dot{width:7px;height:7px;border-radius:50%;background:var(--red);box-shadow:0 0 8px var(--red);}
+    /* Header */
+    .slate{
+      position:relative;
+      overflow:hidden;
+      border-bottom:1px solid var(--line);
+      background:var(--bg-1);
+    }
+    .slate-stripes{
+      height:14px;
+      width:100%;
+      background:repeating-linear-gradient(-35deg, var(--cream) 0 26px, #1a1d3d 26px 52px);
+      opacity:0.9;
+    }
+    .slate-inner{
+      max-width:1240px;
+      margin:0 auto;
+      padding:32px 24px 28px;
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:20px;
+      flex-wrap:wrap;
+    }
+    .slate-eyebrow{
+      font-family:var(--mono);
+      font-size:12px;
+      letter-spacing:0.16em;
+      color:var(--gold);
+      text-transform:uppercase;
+      margin:0 0 8px;
+    }
+    h1.slate-title{
+      font-family:var(--serif-display);
+      font-weight:400;
+      font-size:clamp(26px,4vw,42px);
+      letter-spacing:0.01em;
+      margin:0;
+      line-height:1.05;
+      text-transform:uppercase;
+    }
+    .slate-title .accent{color:var(--gold);}
+    .slate-sub{
+      max-width:560px;
+      color:var(--cream-dim);
+      font-size:14px;
+      margin-top:8px;
+    }
+    .header-actions{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .btn-tutor {
+      background: rgba(240,169,62,0.12);
+      color: var(--gold);
+      border: 1px solid var(--gold-dim);
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-tutor:hover { background: rgba(240,169,62,0.22); transform: translateY(-1px); }
+    .take-counter{
+      font-family:var(--mono);
+      font-size:12px;
+      color:var(--cream-dim);
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:8px 16px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      white-space:nowrap;
+    }
+    .take-counter b{color:var(--gold); font-weight:600;}
+    .take-dot{width:7px;height:7px;border-radius:50%;background:var(--teal);box-shadow:0 0 8px var(--teal);}
 
-  .wrap{
-    max-width:1180px;
-    margin:0 auto;
-    padding:32px 28px 80px;
-    display:grid;
-    grid-template-columns:1.05fr 0.95fr;
-    gap:28px;
-    align-items:start;
-  }
-  @media (max-width:960px){
-    .wrap{grid-template-columns:1fr; padding:24px 16px 60px;}
-    .slate-inner{padding:28px 16px 24px;}
-  }
+    /* Layout */
+    .wrap{
+      max-width:1240px;
+      margin:0 auto;
+      padding:28px 24px 80px;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:28px;
+      align-items:start;
+    }
+    @media (max-width:1024px){
+      .wrap{grid-template-columns:1fr; padding:20px 16px 60px;}
+      .slate-inner{padding:24px 16px 20px;}
+      .output-col{position:static !important; top:auto !important;}
+    }
 
-  .section{
-    background:var(--panel);
-    border:1px solid var(--line-soft);
-    border-radius:var(--radius);
-    padding:22px 22px 24px;
-    margin-bottom:20px;
-  }
-  .section-head{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    margin-bottom:18px;
-  }
-  .section-num{
-    font-family:var(--mono);
-    font-size:12px;
-    color:var(--bg-0);
-    background:var(--gold);
-    border-radius:6px;
-    padding:3px 8px;
-    font-weight:600;
-    letter-spacing:0.04em;
-  }
-  .section-title{
-    font-family:var(--serif-display);
-    font-weight:400;
-    font-size:19px;
-    text-transform:uppercase;
-    letter-spacing:0.02em;
-  }
+    .section{
+      background:var(--panel);
+      border:1px solid var(--line-soft);
+      border-radius:var(--radius);
+      padding:20px 20px 22px;
+      margin-bottom:18px;
+      transition:border-color 0.2s;
+    }
+    .section-head{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-bottom:16px;
+    }
+    .section-num{
+      font-family:var(--mono);
+      font-size:11px;
+      color:var(--bg-0);
+      background:var(--gold);
+      border-radius:5px;
+      padding:2px 7px;
+      font-weight:700;
+    }
+    .section-title{
+      font-family:var(--serif-display);
+      font-weight:400;
+      font-size:18px;
+      text-transform:uppercase;
+      letter-spacing:0.02em;
+    }
 
-  .field{margin-bottom:16px;}
-  .field:last-child{margin-bottom:0;}
-  .field label{
-    display:block;
-    font-size:12.5px;
-    font-weight:600;
-    color:var(--cream-dim);
-    margin-bottom:6px;
-    letter-spacing:0.01em;
-  }
-  .field label .req{color:var(--red); margin-left:2px;}
-  .field input[type=text], .field select, .field textarea{
-    width:100%;
-    background:var(--panel-2);
-    border:1px solid var(--line-soft);
-    color:var(--cream);
-    border-radius:9px;
-    padding:11px 12px;
-    font-family:var(--sans);
-    font-size:14px;
-    outline:none;
-    transition:border-color .15s ease, box-shadow .15s ease;
-  }
-  .field textarea{resize:vertical; min-height:64px;}
-  .field input::placeholder, .field textarea::placeholder{color:rgba(243,239,228,0.32);}
-  .field input:focus, .field select:focus, .field textarea:focus{
-    border-color:var(--gold-dim);
-    box-shadow:0 0 0 3px rgba(240,169,62,0.12);
-  }
-  .field select{
-    appearance:none;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23f0a93e'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.148l3.71-3.918a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E");
-    background-repeat:no-repeat;
-    background-position:right 12px center;
-    padding-right:34px;
-  }
-  .field .custom-input{margin-top:8px; display:none;}
-  .field .custom-input.show{display:block;}
-  .checkbox-label{
-    display:flex !important;
-    align-items:center;
-    gap:9px;
-    font-size:13.5px;
-    font-weight:600;
-    color:var(--cream);
-    cursor:pointer;
-    line-height:1.45;
-  }
-  .checkbox-label input[type=checkbox]{
-    margin-top:0px;
-    width:16px;
-    height:16px;
-    accent-color:var(--gold);
-    flex-shrink:0;
-    cursor:pointer;
-  }
-  .field.is-disabled{display:none;}
-  .row2{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
-  @media (max-width:560px){.row2{grid-template-columns:1fr;}}
-  .hint{font-size:11.5px; color:rgba(243,239,228,0.4); margin-top:5px;}
+    .field{margin-bottom:14px; position:relative;}
+    .field:last-child{margin-bottom:0;}
+    .field label{
+      display:block;
+      font-size:12px;
+      font-weight:600;
+      color:var(--cream-dim);
+      margin-bottom:5px;
+    }
+    .field label .req{color:var(--red); margin-left:2px; font-weight:bold;}
+    .field input[type=text], .field select, .field textarea{
+      width:100%;
+      background:var(--panel-2);
+      border:1px solid var(--line-soft);
+      color:var(--cream);
+      border-radius:8px;
+      padding:10px 12px;
+      font-family:var(--sans);
+      font-size:13.5px;
+      outline:none;
+      transition:border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
+    }
+    .field textarea{resize:vertical; min-height:60px;}
+    .field input::placeholder, .field textarea::placeholder{color:rgba(243,239,228,0.3);}
+    .field input:focus, .field select:focus, .field textarea:focus{
+      border-color:var(--gold-dim);
+      box-shadow:0 0 0 3px rgba(240,169,62,0.12);
+    }
+    
+    /* Error Validation State */
+    .field.has-error input, .field.has-error select, .field.has-error textarea{
+      border-color: var(--red) !important;
+      background-color: var(--red-bg) !important;
+      animation: shake 0.3s ease-in-out;
+    }
+    .field-error-msg{
+      display:none;
+      color:var(--red);
+      font-size:11px;
+      margin-top:4px;
+      font-weight:600;
+    }
+    .field.has-error .field-error-msg{display:block;}
 
-  .action-bar{
-    position:sticky;
-    bottom:16px;
-    display:flex;
-    justify-content:center;
-    margin-top:6px;
-    z-index: 10;
-  }
-  .btn-generate{
-    font-family:var(--serif-display);
-    text-transform:uppercase;
-    letter-spacing:0.05em;
-    font-size:17px;
-    background:var(--gold);
-    color:#1a1200;
-    border:none;
-    border-radius:10px;
-    padding:16px 40px;
-    cursor:pointer;
-    box-shadow:0 10px 30px rgba(240,169,62,0.28), 0 2px 0 rgba(0,0,0,0.2) inset;
-    transition:transform .12s ease, box-shadow .12s ease;
-    display:flex;
-    align-items:center;
-    gap:10px;
-    width:100%;
-    justify-content:center;
-  }
-  .btn-generate:hover{transform:translateY(-1px); box-shadow:0 14px 34px rgba(240,169,62,0.36);}
-  .btn-generate:active{transform:translateY(1px);}
-  .clap-icon{font-size:19px;}
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-4px); }
+      75% { transform: translateX(4px); }
+    }
 
-  .output-col{position:sticky; top:20px;}
-  .output-panel{
-    background:var(--panel);
-    border:1px solid var(--line-soft);
-    border-radius:var(--radius);
-    padding:20px;
-    min-height:340px;
-    display:flex;
-    flex-direction:column;
-  }
-  .output-head{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    margin-bottom:14px;
-    flex-wrap:wrap;
-    gap:10px;
-  }
-  .output-title{
-    font-family:var(--serif-display);
-    font-size:18px;
-    text-transform:uppercase;
-    letter-spacing:0.02em;
-  }
-  .output-actions{display:flex; gap:8px; flex-wrap:wrap;}
-  .btn-mini{
-    font-family:var(--sans);
-    font-size:12.5px;
-    font-weight:600;
-    background:transparent;
-    border:1px solid var(--line-soft);
-    color:var(--cream-dim);
-    border-radius:8px;
-    padding:8px 12px;
-    cursor:pointer;
-    display:flex;
-    align-items:center;
-    gap:6px;
-    transition:border-color .15s ease, color .15s ease, background .15s ease;
-  }
-  .btn-mini:hover{border-color:var(--gold-dim); color:var(--gold);}
-  .btn-mini.copied{background:var(--teal); border-color:var(--teal); color:#08201c;}
+    .field select{
+      appearance:none;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23f0a93e'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.148l3.71-3.918a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E");
+      background-repeat:no-repeat;
+      background-position:right 12px center;
+      padding-right:32px;
+    }
+    .field .custom-input{margin-top:6px; display:none;}
+    .field .custom-input.show{display:block;}
+    .checkbox-label{
+      display:flex !important;
+      align-items:center;
+      gap:8px;
+      font-size:13px;
+      font-weight:500;
+      color:var(--cream);
+      cursor:pointer;
+      user-select:none;
+    }
+    .checkbox-label input[type=checkbox]{
+      margin:0;
+      width:16px;
+      height:16px;
+      accent-color:var(--gold);
+      cursor:pointer;
+    }
+    .field.is-disabled{display:none;}
+    .row2{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+    @media (max-width:560px){.row2{grid-template-columns:1fr;}}
+    .hint{font-size:11.5px; color:rgba(243,239,228,0.45); margin-top:4px; line-height:1.4;}
 
-  .script-paper{
-    background:#0f1130;
-    border:1px solid var(--line-soft);
-    border-radius:10px;
-    padding:16px;
-    flex:1;
-    overflow:auto;
-    max-height:62vh;
-  }
-  .script-paper pre{
-    margin:0;
-    font-family:var(--mono);
-    font-size:12.3px;
-    line-height:1.65;
-    white-space:pre-wrap;
-    word-break:break-word;
-    color:rgba(243,239,228,0.9);
-  }
-  .placeholder-empty{
-    color:rgba(243,239,228,0.35);
-    font-size:13px;
-    font-family:var(--mono);
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    height:100%;
-    text-align:center;
-    gap:8px;
-    padding:40px 20px;
-  }
-  .output-note{
-    font-size:11.5px;
-    color:var(--cream-dim);
-    margin-top:12px;
-  }
+    /* Notification Banner */
+    .validation-banner{
+      display:none;
+      background:rgba(226, 87, 76, 0.15);
+      border:1px solid var(--red);
+      color:#ff9b94;
+      padding:12px 16px;
+      border-radius:10px;
+      font-size:13px;
+      margin-bottom:16px;
+      align-items:center;
+      gap:10px;
+    }
+    .validation-banner.show{display:flex;}
 
-  .modal-overlay {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(4px);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    opacity: 0;
-    transition: opacity 0.2s ease;
-  }
-  .modal-overlay.show {
-    display: flex;
-    opacity: 1;
-  }
-  .modal-content {
-    background: var(--bg-1);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    width: 90%;
-    max-width: 700px;
-    max-height: 90vh;
-    overflow-y: auto;
-    padding: 30px;
-    position: relative;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-  }
-  .modal-close {
-    position: absolute;
-    top: 20px; right: 20px;
-    background: transparent;
-    border: none;
-    color: var(--cream-dim);
-    font-size: 24px;
-    cursor: pointer;
-  }
-  .modal-close:hover { color: var(--gold); }
-  .modal-title {
-    font-family: var(--serif-display);
-    font-size: 24px;
-    color: var(--gold);
-    margin: 0 0 20px 0;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-  }
-  .tutor-step {
-    background: var(--panel);
-    border-radius: 8px;
-    padding: 16px;
-    margin-bottom: 16px;
-    border-left: 4px solid var(--gold);
-  }
-  .tutor-step h3 {
-    margin: 0 0 8px 0;
-    font-size: 15px;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .tutor-step h3 span {
-    background: var(--gold);
-    color: #000;
-    width: 24px; height: 24px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 13px; font-weight: 800;
-  }
-  .tutor-step p { margin: 0; font-size: 13.5px; color: var(--cream-dim); line-height: 1.5; }
-  .tutor-step ul { margin: 8px 0 0 0; padding-left: 20px; font-size: 13.5px; color: var(--cream-dim); }
+    /* Action bar */
+    .action-bar{
+      position:sticky;
+      bottom:16px;
+      display:flex;
+      gap:10px;
+      margin-top:8px;
+      z-index: 10;
+    }
+    .btn-generate{
+      font-family:var(--serif-display);
+      text-transform:uppercase;
+      letter-spacing:0.04em;
+      font-size:16px;
+      background:var(--gold);
+      color:#1a1200;
+      border:none;
+      border-radius:10px;
+      padding:14px 24px;
+      cursor:pointer;
+      box-shadow:0 8px 24px rgba(240,169,62,0.25);
+      transition:transform .12s ease, box-shadow .12s ease, background-color .15s;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex:1;
+      justify-content:center;
+    }
+    .btn-generate:hover{transform:translateY(-1px); box-shadow:0 12px 28px rgba(240,169,62,0.35); background:#ffb44b;}
+    .btn-generate:active{transform:translateY(1px);}
+    
+    .btn-reset{
+      font-family:var(--sans);
+      font-size:13px;
+      font-weight:600;
+      background:var(--panel-2);
+      color:var(--cream-dim);
+      border:1px solid var(--line-soft);
+      border-radius:10px;
+      padding:12px 18px;
+      cursor:pointer;
+      transition:all 0.15s ease;
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .btn-reset:hover{background:rgba(226,87,76,0.15); color:var(--red); border-color:var(--red);}
 
-  footer{
-    max-width:1180px;
-    margin:0 auto;
-    padding:0 28px 40px;
-    color:rgba(243,239,228,0.35);
-    font-size:11.5px;
-    text-align:center;
-  }
-</style>
+    /* Output Column */
+    .output-col{position:sticky; top:20px;}
+    .output-panel{
+      background:var(--panel);
+      border:1px solid var(--line-soft);
+      border-radius:var(--radius);
+      padding:20px;
+      min-height:380px;
+      display:flex;
+      flex-direction:column;
+    }
+    .output-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:12px;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+    .output-title{
+      font-family:var(--serif-display);
+      font-size:18px;
+      text-transform:uppercase;
+      letter-spacing:0.02em;
+    }
+    .output-actions{display:flex; gap:6px; flex-wrap:wrap;}
+    .btn-mini{
+      font-family:var(--sans);
+      font-size:12px;
+      font-weight:600;
+      background:transparent;
+      border:1px solid var(--line-soft);
+      color:var(--cream-dim);
+      border-radius:7px;
+      padding:7px 11px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      gap:5px;
+      transition:all .15s ease;
+    }
+    .btn-mini:hover{border-color:var(--gold-dim); color:var(--gold);}
+    .btn-mini.copied{background:var(--teal); border-color:var(--teal); color:#08201c;}
+
+    /* Quick Navigation Tabs */
+    .stage-nav-tabs{
+      display:flex;
+      gap:6px;
+      margin-bottom:14px;
+      padding-bottom:10px;
+      border-bottom:1px solid var(--line-soft);
+      overflow-x:auto;
+      scrollbar-width:none;
+    }
+    .stage-nav-tabs::-webkit-scrollbar{display:none;}
+    .tab-btn{
+      font-family:var(--sans);
+      font-size:12px;
+      font-weight:600;
+      background:var(--panel-2);
+      border:1px solid var(--line-soft);
+      color:var(--cream-dim);
+      border-radius:6px;
+      padding:6px 12px;
+      cursor:pointer;
+      white-space:nowrap;
+      transition:all 0.15s ease;
+    }
+    .tab-btn:hover{background:rgba(240,169,62,0.15); color:var(--gold);}
+    .tab-btn.active{
+      background:var(--gold);
+      color:#12142b;
+      border-color:var(--gold);
+      font-weight:700;
+    }
+
+    .output-stages-container{
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+      flex:1;
+      overflow-y:auto;
+      max-height:74vh;
+      padding-right:4px;
+    }
+    .stage-box{
+      background:#0d0f28;
+      border:1px solid var(--line-soft);
+      border-radius:10px;
+      padding:16px;
+      display:none;
+      flex-direction:column;
+    }
+    .stage-box.show{display:flex;}
+    .stage-box.is-hidden-by-tab{display:none !important;}
+    .stage-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:10px;
+      padding-bottom:8px;
+      border-bottom:1px solid var(--line-soft);
+    }
+    .stage-title{
+      font-size:13.5px;
+      font-weight:700;
+      color:var(--gold);
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .stage-box pre{
+      margin:0;
+      font-family:var(--mono);
+      font-size:12px;
+      line-height:1.6;
+      white-space:pre-wrap;
+      word-break:break-word;
+      color:rgba(243,239,228,0.92);
+    }
+    .placeholder-empty{
+      color:rgba(243,239,228,0.35);
+      font-size:13px;
+      font-family:var(--mono);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      min-height:300px;
+      text-align:center;
+      gap:8px;
+      padding:40px 20px;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(10,12,28,0.82);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 16px;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal-content {
+      background: var(--bg-1);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 680px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 24px;
+      position: relative;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+    }
+    .modal-close {
+      position: absolute;
+      top: 18px; right: 18px;
+      background: transparent;
+      border: none;
+      color: var(--cream-dim);
+      font-size: 24px;
+      cursor: pointer;
+    }
+    .modal-close:hover { color: var(--gold); }
+    .modal-title {
+      font-family: var(--serif-display);
+      font-size: 22px;
+      color: var(--gold);
+      margin: 0 0 16px 0;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+    .tutor-step {
+      background: var(--panel);
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+      border-left: 4px solid var(--gold);
+    }
+    .tutor-step h3 {
+      margin: 0 0 6px 0;
+      font-size: 14.5px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .tutor-step h3 span {
+      background: var(--gold);
+      color: #000;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 800;
+    }
+    .tutor-step p { margin: 0; font-size: 13px; color: var(--cream-dim); line-height: 1.5; }
+    .tutor-step ul { margin: 6px 0 0 0; padding-left: 20px; font-size: 13px; color: var(--cream-dim); }
+
+    footer{
+      max-width:1240px;
+      margin:0 auto;
+      padding:0 24px 40px;
+      color:rgba(243,239,228,0.35);
+      font-size:11.5px;
+      text-align:center;
+    }
+  </style>
 </head>
 <body>
 
+<!-- MODAL TUTORIAL -->
 <div class="modal-overlay" id="tutorialModal">
   <div class="modal-content">
     <button class="modal-close" id="closeTutorial">&times;</button>
-    <h2 class="modal-title">Alur Kerja (Workflow) AI Video</h2>
+    <h2 class="modal-title">Alur Kerja (Chain of Prompting) 4 Tahap</h2>
     
     <div class="tutor-step">
-      <h3><span>1</span> Dapatkan Master Prompt</h3>
-      <p>Isi form di aplikasi ini. Setelah selesai, klik tombol <b>"Buat Master Prompt"</b> lalu salin (copy) teks hasilnya. Tempelkan (paste) prompt tersebut ke Chatbot AI andalan Anda seperti <a href="https://chatgpt.com" target="_blank">ChatGPT</a> atau <a href="https://gemini.google.com" target="_blank">Google Gemini</a> untuk mendapatkan <b>Storyboard</b>, <b>Prompt Image</b>, dan <b>Prompt Video</b>.</p>
+      <h3><span>1</span> Tahap 1: Storyboard Master</h3>
+      <p>Salin prompt Tahap 1 ke <a href="https://chatgpt.com" target="_blank">ChatGPT</a> atau <a href="https://gemini.google.com" target="_blank">Gemini</a>. AI akan menghasilkan alur adegan dan naskah (@4-8 detik per scene) sesuai jenis video dan durasi yang Anda tentukan.</p>
     </div>
-
     <div class="tutor-step">
-      <h3><span>2</span> Generate Gambar (Visual Assets)</h3>
-      <p>Ambil bagian <i>"Final Prompt"</i> dari Output 2 (Prompt Image), lalu paste-kan ke AI pembuat gambar. Simpan gambar yang dihasilkan ke komputer Anda.<br><b>Rekomendasi AI:</b> <a href="https://chatgpt.com" target="_blank">ChatGPT (DALL-E 3)</a>, <a href="https://gemini.google.com" target="_blank">Gemini (Imagen 3)</a>, atau Midjourney.</p>
+      <h3><span>2</span> Tahap 2: Prompt Gambar Panel Grid / Reference Sheet</h3>
+      <p>Salin prompt Tahap 2 ke chat yang sama. AI akan menyusun prompt untuk membuat kisi visual (grid storyboard) atau lembar referensi karakter &amp; latar untuk menjaga konsistensi visual.</p>
     </div>
-
     <div class="tutor-step">
-      <h3><span>3</span> Animasi Video (Image-to-Video)</h3>
-      <p>Masukkan gambar yang sudah Anda simpan ke alat pembuat video AI. Salin instruksi dari Output 3 (Prompt Video) dan masukkan sebagai prompt agar video bergerak sesuai skenario edukasi.<br><b>Rekomendasi AI Video:</b></p>
-      <ul>
-        <li><a href="https://deepmind.google/technologies/veo/" target="_blank">Gemini Video (Veo)</a> / <a href="https://cloud.google.com/vertex-ai" target="_blank">Google Flow</a></li>
-        <li><a href="https://klingai.com/" target="_blank">Kling AI</a> (Sangat bagus untuk pergerakan realistis)</li>
-        <li><a href="https://runwayml.com/" target="_blank">Runway Gen-3</a> atau <a href="https://lumalabs.ai/dream-machine" target="_blank">Luma Dream Machine</a></li>
-        <li><a href="https://workspace.google.com/products/vids/" target="_blank">Google Vids</a></li>
-      </ul>
+      <h3><span>3</span> Tahap 3: Prompt Gambar Detail per Scene (Polos / No Text)</h3>
+      <p>Salin prompt Tahap 3 ke chat yang sama. AI akan menghasilkan prompt gambar individu berkualitas sinematik yang <b>100% bebas dari teks melayang</b> dan siap digenerate di DALL-E 3 atau Midjourney.</p>
     </div>
-
     <div class="tutor-step">
-      <h3><span>4</span> Editing & Finishing (Voice & Teks)</h3>
-      <p>Kumpulkan semua potongan video yang sudah jadi. Masukkan ke aplikasi editing. Tambahkan pop-up teks pembelajaran, musik, dan dubbing suara (jika merekam sendiri) sesuai dengan Storyboard Output 1.<br><b>Rekomendasi Editor:</b> <a href="https://www.capcut.com/" target="_blank">CapCut</a>, <a href="https://www.canva.com/" target="_blank">Canva</a>, atau <a href="https://workspace.google.com/products/vids/" target="_blank">Google Vids</a>.</p>
+      <h3><span>4</span> Tahap 4: Prompt Animasi Video (Motion Continuity &amp; Pop-up)</h3>
+      <p>Salin prompt Tahap 4 ke chat. AI akan membuat instruksi animasi video (Image-to-Video) dengan aturan <i>Still Start &amp; Motion Hold</i>. Gunakan di <a href="https://deepmind.google/technologies/veo/" target="_blank">Gemini Video (Veo)</a>, <a href="https://cloud.google.com/vertex-ai" target="_blank">Google Flow</a>, atau <a href="https://klingai.com/" target="_blank">Kling AI</a>. Gabungkan dan beri teks akhir di <a href="https://www.capcut.com/" target="_blank">CapCut</a> atau <a href="https://www.canva.com/" target="_blank">Canva</a>.</p>
     </div>
   </div>
 </div>
 
+<!-- MODAL KONFIRMASI RESET -->
+<div class="modal-overlay" id="resetModal">
+  <div class="modal-content" style="max-width:440px; text-align:center;">
+    <h2 class="modal-title" style="color:var(--red);">Bersihkan Formulir?</h2>
+    <p style="font-size:13.5px; color:var(--cream-dim); margin-bottom:20px;">Semua isian formulir dan hasil prompt yang telah digenerate akan dikosongkan kembali ke awal.</p>
+    <div style="display:flex; justify-content:center; gap:10px;">
+      <button class="btn-mini" id="cancelResetBtn" style="padding:10px 18px; font-size:13px;">Batal</button>
+      <button class="btn-mini" id="confirmResetBtn" style="background:var(--red); border-color:var(--red); color:#fff; padding:10px 18px; font-size:13px;">Ya, Kosongkan</button>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
 <div class="slate">
   <div class="slate-stripes"></div>
   <div class="slate-inner">
     <div>
-      <p class="slate-eyebrow">Take 001 &middot; Video Pembelajaran</p>
-      <h1 class="slate-title">Generator <span class="accent">Prompt</span><br>Video Pembelajaran</h1>
-      <p class="slate-sub">Hasilkan "Super Prompt" (Storyboard, Prompt Image Sinematik, Prompt Video Sutradara) sekaligus. Didesain khusus untuk alur produksi video AI guru profesional.</p>
-      <button class="btn-tutor" id="openTutorial">📖 Cara Penggunaan (Tutorial)</button>
+      <p class="slate-eyebrow">AI Video Production &middot; Edisi Guru Profesional</p>
+      <h1 class="slate-title">Generator <span class="accent">Prompt</span> Video Pembelajaran</h1>
+      <p class="slate-sub">Hasilkan rangkaian prompt berurutan (Chain of Prompting 4 Tahap) siap pakai untuk menghasilkan naskah, grid visual, prompt gambar bersih (no-text), hingga animasi video sinematik.</p>
     </div>
-    <div class="take-counter"><span class="take-dot"></span> Diisi: <b id="filledCount">0</b> kolom</div>
+    <div class="header-actions">
+      <button class="btn-tutor" id="openTutorial">📖 Panduan 4 Tahap</button>
+      <div class="take-counter"><span class="take-dot"></span> Status Form: <b id="filledCount">0</b> diisi</div>
+    </div>
   </div>
 </div>
 
+<!-- MAIN CONTENT -->
 <div class="wrap">
-  <div class="form-col">
 
+  <!-- FORM COLUMN (LEFT) -->
+  <div class="form-col">
+    <div class="validation-banner" id="validationBanner">
+      <span>⚠️</span> <span id="validationMsg">Mohon lengkapi kolom yang bertanda bintang (*) sebelum membuat prompt.</span>
+    </div>
+    
     <!-- SECTION 1 -->
-    <div class="section">
-      <div class="section-head"><span class="section-num">01</span><span class="section-title">Informasi Dasar</span></div>
-      <div class="field">
+    <div class="section" id="sec1">
+      <div class="section-head"><span class="section-num">01</span><span class="section-title">Informasi Dasar Video</span></div>
+      
+      <div class="field" id="field-judul">
         <label>Judul Video <span class="req">*</span></label>
-        <input type="text" id="judul" placeholder="Contoh: Mengenal Fotosintesis pada Tumbuhan">
+        <input type="text" id="judul" placeholder="Contoh: Mengapa Es Kutub Mencair? (Perubahan Wujud Zat)">
+        <div class="field-error-msg">Judul video wajib diisi</div>
       </div>
+
       <div class="row2">
-        <div class="field">
+        <div class="field" id="field-mapel">
           <label>Mata Pelajaran <span class="req">*</span></label>
-          <input type="text" id="mapel" placeholder="Contoh: IPAS">
+          <input type="text" id="mapel" placeholder="Contoh: IPA / Biologi / Fisika">
+          <div class="field-error-msg">Mata pelajaran wajib diisi</div>
         </div>
-        <div class="field">
-          <label>Kelas <span class="req">*</span></label>
-          <input type="text" id="kelas" placeholder="Contoh: X SMK / Paket B">
+        <div class="field" id="field-kelas">
+          <label>Kelas &amp; Jenjang <span class="req">*</span></label>
+          <input type="text" id="kelas" placeholder="Contoh: VII SMP / X SMK / Umum">
+          <div class="field-error-msg">Kelas &amp; jenjang wajib diisi</div>
         </div>
       </div>
+
       <div class="row2">
-        <div class="field">
-          <label>Jenjang</label>
-          <select id="jenjang">
-            <option value="SD">SD / Paket A</option>
-            <option value="SMP">SMP / Paket B</option>
-            <option value="SMA">SMA / Paket C</option>
-            <option value="SMK">SMK</option>
-            <option value="PKBM">PKBM / Kesetaraan</option>
-            <option value="__custom__">Isi sendiri...</option>
+        <div class="field" id="field-jenisVideo">
+          <label>Jenis Video / Alur Pedagogis <span class="req">*</span></label>
+          <select id="jenisVideo">
+            <option value="Video Konsep">Video Konsep (Definisi, Analogi, & Contoh Konkret)</option>
+            <option value="Video Eksperimen">Video Eksperimen (Setup → Prosedur → Observasi → Hasil → Kesimpulan)</option>
+            <option value="Video Demonstrasi">Video Demonstrasi (Alat, Tahapan Praktik, Tips Kunci)</option>
+            <option value="Video Storytelling">Video Storytelling (Hook → Masalah → Petualangan/Eksplorasi → Solusi)</option>
+            <option value="Video Animasi Penjelasan">Video Animasi Penjelasan (Visualisasi Intuitif Konsep Kompleks)</option>
+            <option value="Video Prosedur / Tutorial">Video Prosedur / Tutorial (Step-by-step Instruksi Praktis)</option>
+            <option value="Video Studi Kasus">Video Studi Kasus (Fenomena Nyata → Analisis → Refleksi)</option>
+            <option value="Video Problem-Based Learning">Video Problem-Based Learning (Tantangan Masalah → Investigasi)</option>
+            <option value="Video Motivasi / Pengantar">Video Motivasi / Pengantar (Pemicu Minat Belajar & Relevansi Hidup)</option>
+            <option value="Video Review / Rangkuman">Video Review / Rangkuman (Poin Kunci & Kuis Refleksi Cepat)</option>
           </select>
-          <input type="text" class="custom-input" id="jenjang_custom" placeholder="Tulis jenjang lain">
         </div>
-        <div class="field">
-          <label>Bahasa Teks & Pop-up <span class="req">*</span></label>
-          <select id="bahasa">
-            <option value="Bahasa Indonesia">Bahasa Indonesia</option>
-            <option value="English">English</option>
-            <option value="Bilingual (Indonesia & Inggris)">Bilingual (Indonesia & Inggris)</option>
-            <option value="__custom__">Isi sendiri...</option>
+        <div class="field" id="field-durasi">
+          <label>Target Total Durasi <span class="req">*</span></label>
+          <select id="durasi">
+            <option value="1 menit (~60 detik / ±8-10 scene)">1 menit (~60 detik / ±8-10 scene)</option>
+            <option value="2 menit (~120 detik / ±15-18 scene)" selected>2 menit (~120 detik / ±15-18 scene)</option>
+            <option value="3 menit (~180 detik / ±20-24 scene)">3 menit (~180 detik / ±20-24 scene)</option>
+            <option value="__custom__">Isi durasi sendiri...</option>
           </select>
-          <input type="text" class="custom-input" id="bahasa_custom" placeholder="Tulis bahasa lain">
+          <input type="text" class="custom-input" id="durasi_custom" placeholder="Contoh: 90 detik, 4 menit">
+          <div class="field-error-msg">Target durasi video wajib dipilih/diisi</div>
         </div>
       </div>
+
       <div class="field">
-        <label>Materi <span class="req">*</span></label>
-        <textarea id="materi" placeholder="Contoh: Proses fotosintesis, faktor yang mempengaruhi, dan hasilnya bagi kehidupan"></textarea>
+        <label>Bahasa Teks Pop-up &amp; Grafis <span class="req">*</span></label>
+        <select id="bahasa">
+          <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+          <option value="English">English</option>
+          <option value="Bilingual (Indonesia & Inggris)">Bilingual (Indonesia &amp; Inggris)</option>
+          <option value="__custom__">Isi sendiri...</option>
+        </select>
+        <input type="text" class="custom-input" id="bahasa_custom" placeholder="Tulis bahasa lain">
       </div>
-      <div class="field">
-        <label>Tujuan Pembelajaran <span class="req">*</span></label>
-        <textarea id="tujuan" placeholder="Contoh: Siswa mampu menjelaskan proses fotosintesis dan mengaitkannya dengan kehidupan sehari-hari"></textarea>
+
+      <div class="field" id="field-materi">
+        <label>Ringkasan Materi Pelajaran <span class="req">*</span></label>
+        <textarea id="materi" placeholder="Jelaskan poin materi utama yang ingin disampaikan dalam video..."></textarea>
+        <div class="field-error-msg">Ringkasan materi wajib diisi</div>
+      </div>
+
+      <div class="field" id="field-tujuan">
+        <label>Tujuan Pembelajaran (Learning Goals) <span class="req">*</span></label>
+        <textarea id="tujuan" placeholder="Contoh: Siswa mampu menganalisis pengaruh kenaikan suhu terhadap es kutub melalui visualisasi eksperimen..."></textarea>
+        <div class="field-error-msg">Tujuan pembelajaran wajib diisi</div>
       </div>
     </div>
 
     <!-- SECTION 2 -->
     <div class="section">
-      <div class="section-head"><span class="section-num">02</span><span class="section-title">Spesifikasi Teknis</span></div>
+      <div class="section-head"><span class="section-num">02</span><span class="section-title">Gaya Visual &amp; Sinematografi</span></div>
+      
       <div class="row2">
         <div class="field">
-          <label>Durasi Video <span class="req">*</span></label>
-          <input type="text" id="durasi" placeholder="Contoh: 3-5 menit">
-        </div>
-        <div class="field">
-          <label>Target Penonton</label>
-          <input type="text" id="target" placeholder="Contoh: Siswa kelas X SMK usia 15-16 tahun">
-        </div>
-      </div>
-      <div class="row2">
-        <div class="field">
-          <label>Platform</label>
-          <select id="platform">
-            <option value="YouTube">YouTube</option>
-            <option value="TikTok">TikTok</option>
-            <option value="Instagram Reels">Instagram Reels</option>
-            <option value="Bebas (diserahkan ke AI)">Bebas (diserahkan ke AI)</option>
-            <option value="__custom__">Isi sendiri...</option>
-          </select>
-          <input type="text" class="custom-input" id="platform_custom" placeholder="Tulis platform lain">
-        </div>
-        <div class="field">
-          <label>Aspect Ratio</label>
-          <select id="ratio">
-            <option value="16:9 (Landscape)">16:9 (Landscape)</option>
-            <option value="9:16 (Portrait)">9:16 (Portrait)</option>
-            <option value="1:1 (Square)">1:1 (Square)</option>
-            <option value="Bebas (diserahkan ke AI)">Bebas (diserahkan ke AI)</option>
-            <option value="__custom__">Isi sendiri...</option>
-          </select>
-          <input type="text" class="custom-input" id="ratio_custom" placeholder="Tulis aspect ratio lain">
-        </div>
-      </div>
-      <div class="field">
-        <label>Resolusi</label>
-        <select id="resolusi">
-          <option value="1080p (Full HD)">1080p (Full HD)</option>
-          <option value="4K (Ultra HD)">4K (Ultra HD)</option>
-          <option value="Bebas (diserahkan ke AI)">Bebas (diserahkan ke AI)</option>
-          <option value="__custom__">Isi sendiri...</option>
-        </select>
-        <input type="text" class="custom-input" id="resolusi_custom" placeholder="Tulis resolusi lain">
-      </div>
-    </div>
-
-    <!-- SECTION 3 -->
-    <div class="section">
-      <div class="section-head"><span class="section-num">03</span><span class="section-title">Gaya Visual &amp; Animasi</span></div>
-      <div class="row2">
-        <div class="field">
-          <label>Gaya Visual</label>
+          <label>Gaya Visual (Art Style)</label>
           <select id="gayaVisual">
             <option value="3D Pixar Animation">3D Pixar Animation</option>
-            <option value="Realistis / Sinematik">Realistis / Sinematik</option>
-            <option value="Anime">Anime</option>
-            <option value="Kartun 2D">Kartun 2D</option>
-            <option value="Flat Design / Vector">Flat Design / Vector</option>
+            <option value="Realistis / Sinematik">Realistis / Sinematik 8K</option>
+            <option value="Anime Makoto Shinkai Style">Anime (Makoto Shinkai Style)</option>
+            <option value="Kartun 2D Modern Flat">Kartun 2D Modern Flat</option>
+            <option value="Clay / Stop Motion">Clay / Stop Motion</option>
             <option value="Bebas (diserahkan ke AI)">Bebas (diserahkan ke AI)</option>
             <option value="__custom__">Isi sendiri...</option>
           </select>
@@ -588,187 +693,255 @@
           <select id="jenisAnimasi">
             <option value="3D Animation">3D Animation</option>
             <option value="2D Animation">2D Animation</option>
-            <option value="Motion Graphic">Motion Graphic</option>
-            <option value="Live Action (video nyata)">Live Action (video nyata)</option>
+            <option value="Motion Graphic & Infografis">Motion Graphic &amp; Infografis</option>
+            <option value="Live Action Sinematik">Live Action Sinematik</option>
             <option value="Bebas (diserahkan ke AI)">Bebas (diserahkan ke AI)</option>
             <option value="__custom__">Isi sendiri...</option>
           </select>
           <input type="text" class="custom-input" id="jenisAnimasi_custom" placeholder="Tulis jenis animasi lain">
         </div>
       </div>
-      <div class="field">
-        <label>Target Emosi Penonton</label>
-        <select id="emosi">
-          <option value="Penasaran / Ingin Tahu">Penasaran / Ingin Tahu</option>
-          <option value="Senang & Ceria">Senang &amp; Ceria</option>
-          <option value="Tenang & Fokus">Tenang &amp; Fokus</option>
-          <option value="Terharu / Terinspirasi">Terharu / Terinspirasi</option>
-          <option value="Bebas (diserahkan ke AI)">Bebas (diserahkan ke AI)</option>
-          <option value="__custom__">Isi sendiri...</option>
-        </select>
-        <input type="text" class="custom-input" id="emosi_custom" placeholder="Tulis target emosi lain">
+
+      <div class="row2">
+        <div class="field">
+          <label>Aspect Ratio</label>
+          <select id="ratio">
+            <option value="16:9 (Landscape - YouTube/Kelas)">16:9 (Landscape - YouTube/Kelas)</option>
+            <option value="9:16 (Portrait - TikTok/Reels)">9:16 (Portrait - TikTok/Reels)</option>
+            <option value="1:1 (Square)">1:1 (Square)</option>
+            <option value="Bebas (diserahkan ke AI)">Bebas (diserahkan ke AI)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Resolusi Target</label>
+          <select id="resolusi">
+            <option value="4K (Ultra HD)">4K (Ultra HD)</option>
+            <option value="1080p (Full HD)">1080p (Full HD)</option>
+            <option value="Bebas (diserahkan ke AI)">Bebas (diserahkan ke AI)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row2">
+        <div class="field">
+          <label>Dinamika Latar / Background</label>
+          <select id="dinamikaLatar">
+            <option value="Statis (Satu lokasi utama konsisten)">Statis (Satu lokasi utama konsisten)</option>
+            <option value="Dinamis (Berpindah latar sesuai alur cerita/materi)">Dinamis (Berpindah latar sesuai cerita)</option>
+            <option value="Bebas (diserahkan ke AI)">Bebas (diserahkan ke AI)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Lokasi / Setting Utama</label>
+          <select id="lokasi">
+            <option value="Laboratorium Sains Modern">Laboratorium Sains Modern</option>
+            <option value="Ruang Kelas Interaktif">Ruang Kelas Interaktif</option>
+            <option value="Alam Terbuka / Kutub / Hutan">Alam Terbuka / Kutub / Hutan</option>
+            <option value="Studio Eksperimen Virtual">Studio Eksperimen Virtual</option>
+            <option value="Bebas (diserahkan ke AI)">Bebas (diserahkan ke AI)</option>
+            <option value="__custom__">Isi sendiri...</option>
+          </select>
+          <input type="text" class="custom-input" id="lokasi_custom" placeholder="Tulis lokasi lain">
+        </div>
+      </div>
+
+      <div class="row2">
+        <div class="field">
+          <label>Suasana / Tone Video</label>
+          <select id="suasana">
+            <option value="Menyenangkan & Menghibur">Menyenangkan &amp; Menghibur</option>
+            <option value="Penuh Rasa Ingin Tahu (Misteri Sains)">Penuh Rasa Ingin Tahu</option>
+            <option value="Menginspirasi & Sinematik">Menginspirasi &amp; Sinematik</option>
+            <option value="Serius & Faktual">Serius &amp; Faktual</option>
+            <option value="Bebas (diserahkan ke AI)">Bebas (diserahkan ke AI)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Target Emosi Penonton</label>
+          <select id="emosi">
+            <option value="Penasaran & Terpukau">Penasaran &amp; Terpukau</option>
+            <option value="Semangat & Ceria">Semangat &amp; Ceria</option>
+            <option value="Tenang & Fokus Memahami">Tenang &amp; Fokus Memahami</option>
+            <option value="Bebas (diserahkan ke AI)">Bebas (diserahkan ke AI)</option>
+          </select>
+        </div>
       </div>
     </div>
 
-    <!-- SECTION 4 -->
+    <!-- SECTION 3 -->
     <div class="section">
-      <div class="section-head"><span class="section-num">04</span><span class="section-title">Cerita &amp; Suasana</span></div>
-      <div class="row2">
-        <div class="field">
-          <label>Bentuk Video</label>
-          <select id="bentuk">
-            <option value="Animasi Cerita">Animasi Cerita</option>
-            <option value="Guru Menjelaskan">Guru Menjelaskan</option>
-            <option value="Infografis Bergerak">Infografis Bergerak</option>
-            <option value="Dokumenter">Dokumenter</option>
-            <option value="Bebas (diserahkan ke AI)">Bebas (diserahkan ke AI)</option>
-            <option value="__custom__">Isi sendiri...</option>
-          </select>
-          <input type="text" class="custom-input" id="bentuk_custom" placeholder="Tulis bentuk video lain">
-        </div>
-        <div class="field">
-          <label>Suasana Video</label>
-          <select id="suasana">
-            <option value="Menyenangkan">Menyenangkan</option>
-            <option value="Serius">Serius</option>
-            <option value="Menginspirasi">Menginspirasi</option>
-            <option value="Bebas (diserahkan ke AI)">Bebas (diserahkan ke AI)</option>
-            <option value="__custom__">Isi sendiri...</option>
-          </select>
-          <input type="text" class="custom-input" id="suasana_custom" placeholder="Tulis suasana lain">
-        </div>
-      </div>
+      <div class="section-head"><span class="section-num">03</span><span class="section-title">Karakter, Audio &amp; Elemen Video</span></div>
+      
+      <!-- Karakter -->
       <div class="field">
-        <label>Lokasi Cerita</label>
-        <select id="lokasi">
-          <option value="Ruang Kelas">Ruang Kelas</option>
-          <option value="Laboratorium">Laboratorium</option>
-          <option value="Alam Terbuka">Alam Terbuka</option>
-          <option value="Bebas (diserahkan ke AI)">Bebas (diserahkan ke AI)</option>
-          <option value="__custom__">Isi sendiri...</option>
-        </select>
-        <input type="text" class="custom-input" id="lokasi_custom" placeholder="Tulis lokasi lain">
-      </div>
-
-      <!-- CHARACTER SELECTION BLOCK -->
-      <div class="field" style="margin-top:20px; padding-top:16px; border-top:1px dashed rgba(240,169,62,0.3);">
-        <label>Kehadiran Karakter di Layar</label>
+        <label>Kehadiran Karakter / Tokoh</label>
         <select id="opsiKarakter">
           <option value="custom">Tentukan Sendiri / Pakai Foto Referensi</option>
           <option value="ai">Bebas (Diserahkan ke AI)</option>
-          <option value="none">TIDAK ADA Karakter (Video Infografis / Objek Saja)</option>
+          <option value="none">TIDAK ADA Karakter (Video Objek / Infografis / Alam)</option>
         </select>
       </div>
+
       <div id="karakterCustomGroup">
         <div class="field">
           <label>Deskripsi Karakter Utama</label>
-          <textarea id="tokoh" placeholder="Contoh: Guru laki-laki usia 30-an, memakai kemeja seragam, ramah."></textarea>
+          <textarea id="tokoh" placeholder="Contoh: Guru perempuan usia 28 tahun, ramah, memakai blazer rapi, kacamata bulat."></textarea>
         </div>
         <div class="field">
           <label class="checkbox-label" for="useRefImage">
             <input type="checkbox" id="useRefImage">
             Gunakan Foto/Gambar Saya sebagai Referensi Wajah
           </label>
-          <div id="refImageNote" class="hint" style="display:none; color: var(--gold); background: rgba(240,169,62,0.1); padding: 10px; border-radius: 8px; margin-top: 8px; border: 1px solid rgba(240,169,62,0.2); line-height: 1.5;">
-            💡 <b>Cara Kerja:</b> Anda tidak perlu mengunggah foto ke web ini. Cukup <b>lampirkan (upload) foto referensi Anda secara manual ke dalam chat ChatGPT / Gemini</b> bersamaan saat mem-paste Master Prompt ini. Prompt telah disetel otomatis agar AI mengadaptasi wajah Anda ke gaya visual yang dipilih!
+          <div id="refImageNote" class="hint" style="display:none; color: var(--gold); background: rgba(240,169,62,0.1); padding: 8px 12px; border-radius: 6px; margin-top: 6px; border: 1px solid rgba(240,169,62,0.2);">
+            💡 <b>Tips:</b> Lampirkan foto Anda langsung di chat ChatGPT / Gemini bersamaan saat menempelkan prompt ini. Prompt otomatis menginstruksikan AI mengunci wajah Anda.
           </div>
         </div>
       </div>
+
+      <!-- Audio -->
+      <div class="field" style="margin-top:16px; padding-top:14px; border-top:1px dashed var(--line-soft);">
+        <label>Elemen Audio yang Direncanakan</label>
+        <div class="row2" style="margin-top:6px;">
+          <label class="checkbox-label"><input type="checkbox" id="audioBGM" checked> Background Music (BGM)</label>
+          <label class="checkbox-label"><input type="checkbox" id="audioSFX" checked> Sound Effects (SFX)</label>
+          <label class="checkbox-label"><input type="checkbox" id="audioVoice" checked> Narasi / Voice Over</label>
+        </div>
+      </div>
+
+      <div id="voiceSettings" style="margin-top:12px;">
+        <div class="row2">
+          <div class="field">
+            <label>Pengisi Suara Narasi</label>
+            <select id="suara">
+              <option value="AI (voice over dibuat oleh AI)">AI (voice over dibuat oleh AI)</option>
+              <option value="Saya sendiri (dimasukkan manual saat edit)">Saya sendiri (Manual di CapCut)</option>
+            </select>
+          </div>
+          <div class="field" id="voiceProfileField">
+            <label>Profil Suara Narator AI</label>
+            <select id="voiceGender">
+              <option value="Perempuan (Dewasa Muda, Ramah & Jelas)">Perempuan (Dewasa Muda, Hangat)</option>
+              <option value="Laki-laki (Dewasa Muda, Berwibawa & Energik)">Laki-laki (Dewasa Muda, Energik)</option>
+              <option value="__custom__">Isi sendiri...</option>
+            </select>
+            <input type="text" class="custom-input" id="voiceGender_custom" placeholder="Tulis jenis suara lain">
+          </div>
+        </div>
+      </div>
+
+      <!-- Pop-up Elements -->
+      <div class="field" style="margin-top:14px; padding-top:12px; border-top:1px dashed var(--line-soft);">
+        <label>Teks / Grafis Pop-up di Video (Diatur di Tahap 4)</label>
+        <select id="opsiPopup">
+          <option value="Aktifkan pop-up teks, diagram, keyword, dan panah edukasi">Aktifkan pop-up teks, diagram, panah &amp; keyword edukasi</option>
+          <option value="Visual murni saja (tanpa grafis pop-up)">Visual murni saja (tanpa teks/grafis pop-up)</option>
+          <option value="Bebas diserahkan ke pertimbangan AI">Bebas diserahkan ke pertimbangan AI</option>
+        </select>
+      </div>
     </div>
-    
-    <!-- SECTION 5 AUDIO & NARRATOR -->
-    <div class="section" style="border-color: rgba(240,169,62,0.4);">
-      <div class="section-head"><span class="section-num" style="background:#fff;color:#000;">05</span><span class="section-title" style="color:var(--gold);">Elemen Audio</span></div>
+
+    <!-- SECTION 4: TAHAPAN OUTPUT -->
+    <div class="section" style="border-color:rgba(240,169,62,0.4);">
+      <div class="section-head"><span class="section-num" style="background:#fff;color:#000;">04</span><span class="section-title" style="color:var(--gold);">Pilih Tahapan Output</span></div>
+      <p class="hint" style="margin-top:-10px; margin-bottom:12px;">Pilih tahapan prompt yang ingin Anda generate:</p>
       
-      <div class="field">
-        <label>Apa saja elemen audio yang ada di video Anda?</label>
-        <div class="row2" style="margin-top:10px;">
-          <label class="checkbox-label" for="audioBGM">
-            <input type="checkbox" id="audioBGM" checked> Background Music (BGM)
-          </label>
-          <label class="checkbox-label" for="audioSFX">
-            <input type="checkbox" id="audioSFX" checked> Sound Effects (SFX)
-          </label>
-          <label class="checkbox-label" for="audioVoice">
-            <input type="checkbox" id="audioVoice" checked> Narasi / Voice Over
-          </label>
-        </div>
-      </div>
-
-      <div id="voiceSettings" style="margin-top:20px; padding-top:16px; border-top:1px dashed rgba(240,169,62,0.3);">
-        <div class="field">
-          <label>Siapa yang Mengisi Suara Narasi?</label>
-          <select id="suara">
-            <option value="Saya sendiri (dimasukkan manual saat pengeditan)">Saya sendiri (dimasukkan manual saat pengeditan di CapCut)</option>
-            <option value="AI (voice over dibuat oleh AI)">AI (voice over dibuat oleh AI)</option>
-          </select>
-        </div>
-        <div class="field" id="voiceProfileField">
-          <label>Profil Suara Narator AI</label>
-          <select id="voiceGender">
-            <option value="Perempuan">Perempuan</option>
-            <option value="Laki-laki">Laki-laki</option>
-            <option value="__custom__">Isi sendiri...</option>
-          </select>
-          <input type="text" class="custom-input" id="voiceGender_custom" placeholder="Tulis jenis suara lain">
-          <div class="row2" style="margin-top:10px;">
-            <div>
-              <select id="voicePitch">
-                <option value="Nada sedang (medium pitch)">Nada sedang</option>
-                <option value="Nada rendah (low pitch)">Nada rendah</option>
-                <option value="Nada tinggi (high pitch)">Nada tinggi</option>
-                <option value="__custom__">Isi sendiri...</option>
-              </select>
-              <input type="text" class="custom-input" id="voicePitch_custom" placeholder="Tulis nada lain">
-            </div>
-            <div>
-              <select id="voiceUsia">
-                <option value="Dewasa muda 25-35 tahun">Dewasa muda 25-35 tahun</option>
-                <option value="Dewasa 35-45 tahun">Dewasa 35-45 tahun</option>
-                <option value="__custom__">Isi sendiri...</option>
-              </select>
-              <input type="text" class="custom-input" id="voiceUsia_custom" placeholder="Tulis rentang usia lain">
-            </div>
-          </div>
-        </div>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <label class="checkbox-label">
+          <input type="checkbox" id="chkTahap1" checked> <b>Tahap 1:</b> Storyboard Master (Naskah &amp; Scene Breakdown Adaptif)
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" id="chkTahap2" checked> <b>Tahap 2:</b> Prompt Gambar Panel Grid (Adaptive Storyboard Grid / Ref Sheet)
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" id="chkTahap3" checked> <b>Tahap 3:</b> Prompt Gambar Detail per Scene (Sinematik, Bersih / 100% No-Text)
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" id="chkTahap4" checked> <b>Tahap 4:</b> Prompt Animasi Video (Motion Continuity &amp; Pop-up Sutradara)
+        </label>
       </div>
     </div>
 
+    <!-- ACTION BUTTONS -->
     <div class="action-bar">
-      <button class="btn-generate" id="generateBtn"><span class="clap-icon">🎬</span> Buat Master Prompt</button>
+      <button class="btn-generate" id="generateBtn"><span class="clap-icon">🎬</span> Generate Prompts</button>
+      <button class="btn-reset" id="resetBtn" title="Kosongkan formulir">🔄 Reset</button>
     </div>
 
   </div>
 
-  <div class="output-col" id="outputSection">
+  <!-- OUTPUT COLUMN (RIGHT) -->
+  <div class="output-col" id="outputCol">
     <div class="output-panel">
       <div class="output-head">
-        <span class="output-title">Hasil Prompt</span>
+        <span class="output-title">Hasil Prompt (4 Tahap)</span>
         <div class="output-actions">
-          <button class="btn-mini" id="copyBtn">📋 Salin</button>
-          <button class="btn-mini" id="downloadBtn">⬇ Unduh .txt</button>
-          <button class="btn-mini" id="excelBtn">📊 Unduh Excel (Template)</button>
+          <button class="btn-mini" id="copyAllBtn">📋 Salin Semua</button>
+          <button class="btn-mini" id="downloadTxtBtn">⬇ Unduh .txt</button>
+          <button class="btn-mini" id="excelBtn">📊 Unduh Excel</button>
         </div>
       </div>
-      <div class="script-paper" id="scriptPaper">
-        <div class="placeholder-empty" id="emptyState">
-          🎞️<br>
-          Isi form di sebelah kiri lalu klik<br><b>"Buat Master Prompt"</b><br>untuk melihat hasilnya di sini.
-        </div>
-        <pre id="promptOutput" style="display:none;"></pre>
+
+      <!-- Quick Navigation Tabs -->
+      <div class="stage-nav-tabs" id="stageNavTabs" style="display:none;">
+        <button class="tab-btn active" data-tab="all">👁️ Tampilkan Semua</button>
+        <button class="tab-btn" data-tab="boxTahap1" id="tabBtn1">🎯 Tahap 1: Storyboard</button>
+        <button class="tab-btn" data-tab="boxTahap2" id="tabBtn2">🖼️ Tahap 2: Grid</button>
+        <button class="tab-btn" data-tab="boxTahap3" id="tabBtn3">🎨 Tahap 3: Gambar Detail</button>
+        <button class="tab-btn" data-tab="boxTahap4" id="tabBtn4">🎥 Tahap 4: Video Animasi</button>
       </div>
-      <p class="output-note">Prompt ini dirancang untuk ditempel ke AI (ChatGPT / Claude / Gemini). AI akan memproses semua tahap sekaligus dengan pola sinematik tinggi. Gunakan <b>Unduh Excel</b> untuk mengarsipkan template ke komputer Anda.</p>
+
+      <div class="placeholder-empty" id="emptyState">
+        🎞️<br>
+        Lengkapi formulir di sebelah kiri lalu klik<br><b>"Generate Prompts"</b><br>untuk melihat rangkaian prompt 4 tahap di sini.
+      </div>
+
+      <div class="output-stages-container" id="outputContainer" style="display:none;">
+        <!-- STAGE 1 -->
+        <div class="stage-box" id="boxTahap1">
+          <div class="stage-header">
+            <span class="stage-title">🎯 TAHAP 1: Storyboard Master &amp; Script Breakdown</span>
+            <button class="btn-mini btn-copy-stage" data-target="outTahap1">📋 Salin Tahap 1</button>
+          </div>
+          <pre id="outTahap1"></pre>
+        </div>
+
+        <!-- STAGE 2 -->
+        <div class="stage-box" id="boxTahap2">
+          <div class="stage-header">
+            <span class="stage-title">🖼️ TAHAP 2: Prompt Adaptive Storyboard Grid / Ref Sheet</span>
+            <button class="btn-mini btn-copy-stage" data-target="outTahap2">📋 Salin Tahap 2</button>
+          </div>
+          <pre id="outTahap2"></pre>
+        </div>
+
+        <!-- STAGE 3 -->
+        <div class="stage-box" id="boxTahap3">
+          <div class="stage-header">
+            <span class="stage-title">🎨 TAHAP 3: Prompt Gambar Detail (Clean / No Text)</span>
+            <button class="btn-mini btn-copy-stage" data-target="outTahap3">📋 Salin Tahap 3</button>
+          </div>
+          <pre id="outTahap3"></pre>
+        </div>
+
+        <!-- STAGE 4 -->
+        <div class="stage-box" id="boxTahap4">
+          <div class="stage-header">
+            <span class="stage-title">🎥 TAHAP 4: Prompt Animasi Video (Motion Continuity)</span>
+            <button class="btn-mini btn-copy-stage" data-target="outTahap4">📋 Salin Tahap 4</button>
+          </div>
+          <pre id="outTahap4"></pre>
+        </div>
+      </div>
     </div>
   </div>
 
 </div>
 
-<footer>Generator Prompt Video Pembelajaran &mdash; dibuat untuk membantu guru memproduksi video pembelajaran berbasis AI.</footer>
+<footer>Generator Prompt Video Pembelajaran &mdash; Didesain khusus untuk para guru dan kreator konten edukasi berbasis AI.</footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-  const allFieldIds = ['judul','mapel','kelas','jenjang','bahasa','materi','tujuan','durasi','target','platform','ratio','resolusi','gayaVisual','jenisAnimasi','emosi','bentuk','suasana','lokasi','tokoh'];
-
+  // Helper getters
   function val(id){
     const el = document.getElementById(id);
     return el ? el.value.trim() : '';
@@ -777,611 +950,495 @@
     const sel = document.getElementById(id);
     if(sel && sel.value === '__custom__'){
       const c = val(id+'_custom');
-      return c || '(belum diisi)';
+      return c || '(disesuaikan)';
     }
     return sel ? sel.value : '';
   }
-  function textVal(id, fallback){
-    const v = val(id);
-    return v ? v : (fallback || '(belum diisi)');
-  }
 
-  function updateCount(){
-    let filled = 0;
-    const opsiKar = document.getElementById('opsiKarakter').value;
-
-    allFieldIds.forEach(id=>{
-      const el = document.getElementById(id);
-      if(!el) return;
-
-      // Skip validation of 'tokoh' if they chose AI or None
-      if (id === 'tokoh' && opsiKar !== 'custom') {
-        filled++; 
-        return; 
-      }
-
-      if(el.tagName === 'SELECT'){
-        if(el.value === '__custom__'){
-          const c = document.getElementById(id+'_custom');
-          if(c && c.value.trim()) filled++;
-        } else if(el.value) filled++;
-      } else {
-        if(el.value.trim()) filled++;
-      }
-    });
-    document.getElementById('filledCount').textContent = filled;
-  }
-
-  const modal = document.getElementById('tutorialModal');
-  const openBtn = document.getElementById('openTutorial');
-  const closeBtn = document.getElementById('closeTutorial');
-
-  openBtn.addEventListener('click', () => { modal.classList.add('show'); });
-  closeBtn.addEventListener('click', () => { modal.classList.remove('show'); });
-  modal.addEventListener('click', (e) => {
-    if(e.target === modal) modal.classList.remove('show');
-  });
-
-  const customPairs = ['jenjang','bahasa','platform','ratio','resolusi','gayaVisual','jenisAnimasi','emosi','bentuk','suasana','lokasi','voiceGender','voicePitch','voiceUsia'];
-  customPairs.forEach(id=>{
+  // Handle custom input dropdowns
+  const customDropdowns = ['bahasa','durasi','gayaVisual','jenisAnimasi','lokasi','voiceGender'];
+  customDropdowns.forEach(id=>{
     const sel = document.getElementById(id);
     const cust = document.getElementById(id+'_custom');
-    if(sel && cust) {
+    if(sel && cust){
       sel.addEventListener('change', ()=>{
         if(sel.value === '__custom__'){ cust.classList.add('show'); cust.focus(); }
         else { cust.classList.remove('show'); }
-        updateCount();
+        updateFieldCount();
       });
     }
   });
 
+  // Karakter logic toggles
   const opsiKarakter = document.getElementById('opsiKarakter');
   const karakterCustomGroup = document.getElementById('karakterCustomGroup');
   const useRefImage = document.getElementById('useRefImage');
   const refImageNote = document.getElementById('refImageNote');
 
   opsiKarakter.addEventListener('change', () => {
-    if (opsiKarakter.value === 'custom') {
-      karakterCustomGroup.style.display = 'block';
-    } else {
-      karakterCustomGroup.style.display = 'none';
+    karakterCustomGroup.style.display = (opsiKarakter.value === 'custom') ? 'block' : 'none';
+    if(opsiKarakter.value !== 'custom') {
       useRefImage.checked = false;
       refImageNote.style.display = 'none';
     }
-    updateCount();
+    updateFieldCount();
   });
 
   useRefImage.addEventListener('change', () => {
     refImageNote.style.display = useRefImage.checked ? 'block' : 'none';
-    updateCount();
   });
 
+  // Audio logic toggles
   const audioVoice = document.getElementById('audioVoice');
   const voiceSettings = document.getElementById('voiceSettings');
   const suaraEl = document.getElementById('suara');
   const voiceProfileField = document.getElementById('voiceProfileField');
 
-  function syncAudioLogic() {
-    if(audioVoice.checked) {
-      voiceSettings.style.display = 'block';
-      const isAI = suaraEl.value.indexOf('AI') === 0;
-      voiceProfileField.classList.toggle('is-disabled', !isAI);
-    } else {
-      voiceSettings.style.display = 'none';
-    }
-    updateCount();
+  function syncAudioUI(){
+    voiceSettings.style.display = audioVoice.checked ? 'block' : 'none';
+    const isAI = suaraEl.value.indexOf('AI') === 0;
+    voiceProfileField.style.display = isAI ? 'block' : 'none';
+    updateFieldCount();
   }
+  audioVoice.addEventListener('change', syncAudioUI);
+  suaraEl.addEventListener('change', syncAudioUI);
+  syncAudioUI();
+
+  // Field counter & Error clearing
+  const requiredFieldIds = ['judul', 'mapel', 'kelas', 'materi', 'tujuan'];
   
-  audioVoice.addEventListener('change', syncAudioLogic);
-  suaraEl.addEventListener('change', syncAudioLogic);
-  syncAudioLogic(); 
+  function updateFieldCount(){
+    let filled = 0;
+    const allInputIds = ['judul','mapel','kelas','materi','tujuan'];
+    allInputIds.forEach(id=>{
+      if(val(id)) filled++;
+    });
+    if(selVal('durasi')) filled++;
+    if(opsiKarakter.value === 'custom' && val('tokoh')) filled++;
+    else if(opsiKarakter.value !== 'custom') filled++;
+    document.getElementById('filledCount').textContent = `${filled}/7`;
+  }
 
   document.querySelectorAll('input, textarea, select').forEach(el=>{
-    el.addEventListener('input', updateCount);
-    el.addEventListener('change', updateCount);
+    el.addEventListener('input', ()=>{
+      const parent = el.closest('.field');
+      if(parent) parent.classList.remove('has-error');
+      document.getElementById('validationBanner').classList.remove('show');
+      updateFieldCount();
+    });
+    el.addEventListener('change', updateFieldCount);
   });
+  updateFieldCount();
 
-  function buildPrompt(){
-    const judul = textVal('judul');
-    const mapel = textVal('mapel');
-    const jenjang = selVal('jenjang');
-    const bahasa = selVal('bahasa');
-    const kelas = textVal('kelas');
-    const materi = textVal('materi');
-    const tujuan = textVal('tujuan');
-    const durasi = textVal('durasi');
-    const target = textVal('target', 'Menyesuaikan jenjang siswa');
-    const platform = selVal('platform');
-    const ratio = selVal('ratio');
-    const resolusi = selVal('resolusi');
-    const gayaVisual = selVal('gayaVisual');
-    const jenisAnimasi = selVal('jenisAnimasi');
-    const emosi = selVal('emosi');
-    const bentuk = selVal('bentuk');
-    const suasana = selVal('suasana');
-    const lokasi = selVal('lokasi');
-    
-    // Character Logic Breakdown
-    const optKar = opsiKarakter.value;
-    const isUsingRefImage = useRefImage.checked;
-    
-    let characterInstruction = "";
-    let refImageAlert = "";
-    let imageRuleAddon = "";
-    let konsistensiChecklist = `✔ karakter\n✔ wajah\n✔ pakaian\n✔ lingkungan\n✔ pencahayaan\n✔ warna\n✔ rendering\n✔ kualitas visual`;
-    
-    // Motion Continuity adjustments for characters
-    let imageConsistencyRule = `ATURAN KONSISTENSI (Otomatis tambahkan kalimat ini di bagian akhir Final Prompt untuk Scene 2 dan seterusnya): "The composition must be suitable as a continuation of the previous scene's final hold frame. Use EXACTLY the same character, same clothing, same environment, same lighting, same rendering style, same facial features, same camera language, and same composition style as the previous scene whenever the story allows. Avoid unnecessary repositioning of the character or major objects. Only change the action."`;
+  // Validate form
+  function validateForm(){
+    let isValid = true;
+    let firstErrorField = null;
 
-    if (optKar === "none") {
-      characterInstruction = "TIDAK ADA KARAKTER DI LAYAR. Fokus video hanya pada lingkungan, visualisasi objek, teks, atau B-roll infografis.";
-      konsistensiChecklist = `✔ lingkungan\n✔ objek materi\n✔ pencahayaan\n✔ warna\n✔ rendering\n✔ kualitas visual\n(TIDAK ADA KARAKTER)`;
-      imageConsistencyRule = `ATURAN KONSISTENSI (Otomatis tambahkan kalimat ini di bagian akhir Final Prompt untuk Scene 2 dan seterusnya): "The composition must be suitable as a continuation of the previous scene's final hold frame. Maintain identical environment, identical objects, same lighting, same rendering style, same camera language, and same composition style as the previous scene. Only change the active motion/camera angle."`;
-    } else if (optKar === "ai") {
-      characterInstruction = "Diserahkan sepenuhnya ke AI untuk merancang karakter (gender, usia, pakaian) yang paling cocok dengan target penonton dan konteks materi.";
-    } else {
-      // custom
-      let tokohText = textVal('tokoh', 'Karakter utama menyesuaikan konteks belajar');
-      if (isUsingRefImage) {
-        refImageAlert = `\n\n[!!! STATUS PENTING: PENGGUNA TELAH MELAMPIRKAN FOTO/GAMBAR REFERENSI KARAKTER DI DALAM CHAT INI !!!]`;
-        characterInstruction = `${tokohText}\n(WAJIB gunakan foto yang dilampirkan pengguna sebagai referensi identitas/wajah karakter ini. Terapkan wajah tersebut secara konsisten ke dalam gaya visual ${gayaVisual} di semua scene)`;
-        imageRuleAddon = `\n\nKARENA PENGGUNA MELAMPIRKAN FOTO REFERENSI: Pada bagian "Final Prompt" di setiap scene, Anda WAJIB menyertakan kalimat instruksi ini secara utuh: "Use the attached photo as the main character face reference, maintaining their exact facial features/identity, but rendering them in the requested visual style (${gayaVisual})."`;
+    requiredFieldIds.forEach(id=>{
+      const input = document.getElementById(id);
+      const fieldContainer = document.getElementById(`field-${id}`) || input.closest('.field');
+      if(!val(id)){
+        isValid = false;
+        if(fieldContainer) fieldContainer.classList.add('has-error');
+        if(!firstErrorField) firstErrorField = input;
       } else {
-        characterInstruction = tokohText;
+        if(fieldContainer) fieldContainer.classList.remove('has-error');
+      }
+    });
+
+    // Validate durasi
+    const durVal = selVal('durasi');
+    const durField = document.getElementById('field-durasi');
+    if(!durVal || durVal === '(disesuaikan)'){
+      isValid = false;
+      if(durField) durField.classList.add('has-error');
+      if(!firstErrorField) firstErrorField = document.getElementById('durasi');
+    } else {
+      if(durField) durField.classList.remove('has-error');
+    }
+
+    if(!isValid){
+      const banner = document.getElementById('validationBanner');
+      banner.classList.add('show');
+      if(firstErrorField){
+        firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        firstErrorField.focus();
       }
     }
-
-    // Audio configuration
-    const useBGM = document.getElementById('audioBGM').checked;
-    const useSFX = document.getElementById('audioSFX').checked;
-    const useVoice = document.getElementById('audioVoice').checked;
-    
-    let audioConfig = [];
-    if(useBGM) audioConfig.push("Background Music (BGM)");
-    if(useSFX) audioConfig.push("Sound Effects (SFX)");
-    
-    let isAIVoice = false;
-    let dialogInstructionForNewFormat = "No dialogue.\nNo voice.\nNo lip sync.";
-    let soundDesignInstruction = "None.";
-    
-    if (useVoice) {
-      let suaraText = selVal('suara');
-      isAIVoice = suaraText.indexOf('AI') === 0;
-      audioConfig.push(`Narasi: ${suaraText}`);
-      if (isAIVoice) {
-         dialogInstructionForNewFormat = `The character says naturally in Indonesian:\n"[Dialogue from Storyboard]"\nNatural Indonesian pronunciation.\nAppropriate emotion and expression.\nPerfect lip synchronization.\nThe dialogue must fit naturally within the scene duration.`;
-      }
-    }
-    const audioString = audioConfig.length > 0 ? audioConfig.join(" + ") : "Visual saja, tanpa audio";
-    if (useBGM || useSFX) {
-      soundDesignInstruction = `[Sebutkan rekomendasi SFX dan nuansa BGM yang spesifik cocok untuk scene ini]`;
-    }
-
-    return `# MASTER ROLE${refImageAlert}
-Anda adalah seorang AI Video Production Director kelas dunia yang memiliki keahlian sebagai:
-- Instructional Designer
-- Guru profesional
-- Subject Matter Expert
-- Script Writer
-- Storyboard Artist
-- Film Director
-- Animation Director
-- Cinematographer
-- Prompt Engineer
-- Learning Experience Designer
-Tugas utama Anda bukan hanya membuat prompt AI.
-Tugas utama Anda adalah merancang pengalaman belajar (Learning Experience) melalui video sehingga siswa benar-benar memahami materi.
-Selalu berpikir seperti seorang sutradara film animasi edukasi pemenang penghargaan internasional.
-=====================================================
-## FILOSOFI
-Video pembelajaran yang baik bukan hanya menjelaskan materi.
-Video harus mampu:
-✔ menarik perhatian siswa sejak detik pertama
-✔ mempertahankan fokus siswa
-✔ membantu siswa memahami konsep melalui visual
-✔ memanfaatkan prinsip "Show, Don't Tell"
-✔ mengurangi penjelasan verbal yang panjang
-✔ memperlihatkan konsep melalui animasi, demonstrasi, ilustrasi, dan visualisasi.
-=====================================================
-## KEBEBASAN SUTRADARA
-Dalam membuat Prompt Image maupun Prompt Video, Anda WAJIB berpikir sebagai sutradara profesional.
-Anda BOLEH menentukan sendiri apabila dianggap membuat pembelajaran menjadi lebih baik:
-• komposisi gambar, posisi karakter, ekspresi, gesture, properti
-• sudut kamera, pergerakan kamera, cinematic shot, close up, wide shot, zoom, dolly
-• lighting, efek visual, efek ilmiah, animasi objek
-• pop-up ilustrasi, keyword, icon, diagram, panah, callout, highlight
-• transition, motion graphic, visual emphasis, infographic animation, split screen
-Selama mendukung pembelajaran.
-=====================================================
-## PRINSIP PEMBELAJARAN
-Selalu gunakan prinsip berikut.
-1. SHOW FIRST: Tampilkan konsep secara visual terlebih dahulu. Baru dijelaskan narasi.
-2. LEARNING BY SEEING: Siswa harus memahami materi bahkan sebelum narasi selesai.
-3. VISUAL IS THE TEACHER: Visual menjadi guru utama. Narasi hanya memperkuat.
-4. ONE SCENE ONE IDEA: Satu scene hanya menjelaskan satu konsep.
-5. VISUAL HIERARCHY: Objek terpenting harus langsung menarik perhatian siswa.
-=====================================================
-## PROMPT IMAGE
-Prompt Image bukan sekadar menghasilkan gambar yang indah.
-Prompt Image harus menghasilkan gambar yang:
-✔ sinematik
-✔ edukatif
-✔ mudah dipahami siswa
-✔ memiliki ruang kosong yang cukup untuk pop-up pembelajaran
-✔ memiliki fokus visual yang jelas
-✔ tidak terlalu ramai
-✔ mudah dianimasikan menjadi video
-=====================================================
-## PROMPT VIDEO
-Prompt Video bukan hanya menggerakkan gambar.
-Prompt Video harus mengubah gambar menjadi pengalaman belajar.
-AI BOLEH secara otomatis menambahkan apabila diperlukan:
-✔ pop-up keyword, animated label, callout, diagram, panah
-✔ zoom, highlight, glow, visual comparison, scientific visualization
-✔ infographic animation, icon animation, transition, emphasis animation, demonstrasi
-tanpa harus diminta satu per satu.
-=====================================================
-## KONSISTENSI
-Semua scene WAJIB mempertahankan:
-${konsistensiChecklist}
-Scene berikutnya adalah kelanjutan langsung dari scene sebelumnya.
-=====================================================
-## MOTION CONTINUITY
-Setiap scene harus memiliki hubungan gerak yang jelas dengan scene berikutnya.
-Setiap scene memiliki tiga fase:
-1. STILL START: Scene dimulai dengan kondisi visual yang stabil berdasarkan gambar referensi.
-2. MAIN ACTION: Gerakan utama terjadi secara natural dan bertahap.
-3. MOTION HOLD: Gerakan secara perlahan berhenti sebelum scene berakhir.
-
-Aturan:
-- Scene berikutnya WAJIB dimulai dari kondisi visual yang stabil.
-- Jangan memulai scene baru dengan karakter atau objek yang tiba-tiba sudah bergerak.
-- Jangan memulai scene baru dari pose yang berbeda jauh dari ending scene sebelumnya.
-- Jangan membuat gerakan yang terputus.
-- Prioritaskan continuity daripada jumlah gerakan.
-- Setiap scene harus dapat dipotong dan disambungkan secara halus di video editor.
-=====================================================
-## TUJUAN AKHIR
-Target akhir bukan menghasilkan prompt.
-Target akhir adalah menghasilkan video pembelajaran yang apabila ditonton siswa terasa seperti film animasi edukasi modern yang menarik, interaktif, dan mudah dipahami.
-=====================================================
-## ADAPTIVE GENERATION
-Sesuaikan seluruh storyboard, prompt image, dan prompt video berdasarkan pilihan pengguna pada generator.
-Contoh:
-- Jika pengguna memilih "Kartun 3D Modern", gunakan gaya visual kartun 3D modern secara konsisten.
-- Jika pengguna memilih "Discovery Learning", buat adegan yang membangun rasa ingin tahu dan mengajak siswa mengamati sebelum memberikan penjelasan.
-- Jika pengguna memilih "Storytelling", susun adegan seperti alur cerita yang menarik.
-Seluruh keputusan visual, sinematografi, animasi, dan efek pembelajaran harus selalu mengikuti pilihan yang diisi pengguna pada Generator.
-
-=====================================================
-
-## KONSEP VIDEO (ACUAN UTAMA)
-
-| Komponen | Isi |
-|---|---|
-| Judul Video | ${judul} |
-| Mata Pelajaran | ${mapel} |
-| Jenjang / Kelas | ${jenjang} / ${kelas} |
-| Bahasa Teks & Pop-up | ${bahasa} |
-| Materi | ${materi} |
-| Tujuan Pembelajaran | ${tujuan} |
-| Durasi Video | ${durasi} |
-| Target Penonton | ${target} |
-| Platform | ${platform} |
-| Aspect Ratio | ${ratio} |
-| Resolusi | ${resolusi} |
-| Gaya Visual | ${gayaVisual} |
-| Jenis Animasi | ${jenisAnimasi} |
-| Target Emosi Penonton | ${emosi} |
-| Bentuk Video | ${bentuk} |
-| Suasana Video | ${suasana} |
-| Lokasi Cerita | ${lokasi} |
-| Karakter Utama | ${characterInstruction} |
-| Elemen Audio | ${audioString} |
-
-=====================================================
-
-## PRIORITAS INSTRUKSI
-Selalu patuhi urutan prioritas berikut:
-1. Konsep Video (prioritas tertinggi)
-2. Tujuan Pembelajaran
-3. Storyboard
-4. Konsistensi Antar Scene
-5. Kreativitas Sutradara
-Jika terjadi konflik, selalu ikuti prioritas di atas.
-
-=====================================================
-
-## OUTPUT 1
-STORYBOARD
-Ini adalah "master" semuanya.
-
-ATURAN MUTLAK STORYBOARD:
-1. Scene pertama WAJIB menjadi VISUAL HOOK. Buat siswa penasaran dalam 3 detik pertama dengan visual yang menarik sebelum penjelasan dimulai.
-2. Durasi setiap scene dikunci pada 8 detik.
-3. Narasi/Dialog WAJIB dibatasi MAKSIMAL 15 - 20 kata per scene! Jika kalimat narasi terlalu panjang, Anda wajib memecahnya ke scene berikutnya.
-
-Buatkan tabel persis seperti format ini:
-
-| Scene | Durasi | Visual | Narasi/Dialog | Transisi |
-
-Lanjutkan langsung ke tahap berikutnya tanpa berhenti.
-
-=====================================================
-
-## OUTPUT 2
-PROMPT IMAGE
-TIDAK BOLEH MENGGUNAKAN TABEL.${imageRuleAddon}
-AI berpikir selengkap mungkin di belakang layar (Color Palette, Mood, Lighting, dll) tetapi yang ditampilkan sebagai output HANYA format blok di bawah ini.
-
-Gunakan format text block ini untuk setiap scene:
-
-====================================
-SCENE [Nomor Scene]
-
-Purpose:
-[Tujuan edukasi dari gambar ini]
-
-Aspect Ratio:
-[${ratio}]
-
-Resolution:
-[${resolusi}]
-
-Final Prompt:
-[Tuliskan SATU paragraf prompt bahasa inggris yang MENGGABUNGKAN Visual Style, Action, Camera, Lighting, Educational Composition, ruang kosong (empty space), dan Visual Hierarchy.
-${imageConsistencyRule}]
-====================================
-
-Lanjutkan langsung ke tahap berikutnya tanpa berhenti.
-
-=====================================================
-
-## OUTPUT 3
-PROMPT VIDEO
-TIDAK BOLEH MENGGUNAKAN TABEL. WAJIB gunakan format text block ini untuk setiap scene:
-
-====================================
-SCENE [Nomor Scene]
-
-Opening Frame:
-Use the generated image from Scene [Nomor Scene] as the exact opening frame.
-Start with a stable and natural composition.
-For the first approximately 1 second, keep the main character and important objects relatively still.
-Do not begin with sudden movement.
-Do not redesign, reposition, or transform the character or environment.
-Maintain complete visual consistency with the reference image.
-
-Learning Goal:
-[Tujuan adegan]
-
-Scene Action:
-[Aksi sesuai storyboard]
-Animate the action naturally and gradually.
-Avoid sudden or excessive movements.
-All movements must support the learning objective.
-
-Educational Enhancement:
-Whenever it helps students understand, freely add:
-- animated labels
-- arrows
-- infographics
-- comparisons
-- process visualization
-- cross-section views
-- highlighted keywords
-- animated icons
-- visual emphasis
-Do not overuse visual effects. Only use effects when they improve learning.
-IMPORTANT: All educational text, labels, keywords, diagrams, and pop-ups MUST be written in ${bahasa.toUpperCase()}.
-
-Motion Continuity:
-IMPORTANT: The scene must end in a stable visual state.
-During the final approximately 1.5 seconds, gradually reduce all character and object movement.
-Slowly settle the movement. Avoid abrupt stops.
-At the end of the scene:
-- the main character must hold a natural pose
-- important objects must remain still
-- camera movement must gradually stop
-- visual effects must settle
-- particles and secondary animations must slow down or stop
-- no new action should begin
-- no character should be walking, jumping, turning, or making a large gesture
-- no object should be moving rapidly
-Create a clean final HOLD FRAME.
-The final frame should remain visually stable and suitable to connect seamlessly with the next scene.
-The ending position must be natural and easy to continue from in the next scene.
-
-Transition Preparation:
-The final frame of this scene must be treated as a visual handoff point for the next scene.
-Do not create a dramatic transition inside the generated video.
-Do not fade to black unless explicitly requested.
-Do not add a sudden camera cut at the end.
-End with a clean, stable composition.
-The next scene should begin from this visual state whenever possible.
-
-Dialogue:
-${dialogInstructionForNewFormat}
-
-Sound Design:
-${soundDesignInstruction}
-
-Director Notes:
-[Fokus utama visual edukasi]
-The visual effects must never distract from the main learning concept.
-
-Technical:
-Duration: 8 seconds
-Aspect Ratio: [${ratio}]
-Resolution: [${resolusi}]
-Animation Style: [${jenisAnimasi}]
-Smooth motion.
-Natural movement.
-Stable final frame.
-====================================
-
-=====================================================
-
-Kerjakan OUTPUT 1, OUTPUT 2, dan OUTPUT 3 sekaligus dalam satu respons ini, tanpa berhenti di tengah. Mulai sekarang.
-PENTING: Pastikan semua teks pop-up layar yang diperintahkan WAJIB DITULIS DALAM ${bahasa.toUpperCase()}!`;
+    return isValid;
   }
 
-  const btn = document.getElementById('generateBtn');
-  const output = document.getElementById('promptOutput');
-  const emptyState = document.getElementById('emptyState');
-  const copyBtn = document.getElementById('copyBtn');
-  const downloadBtn = document.getElementById('downloadBtn');
-
-  btn.addEventListener('click', ()=>{
-    const text = buildPrompt();
-    output.textContent = text;
-    output.style.display = 'block';
-    emptyState.style.display = 'none';
-    btn.textContent = '';
-    const icon = document.createElement('span');
-    icon.className = 'clap-icon';
-    icon.textContent = '✅';
-    btn.appendChild(icon);
-    btn.appendChild(document.createTextNode(' Prompt Diperbarui'));
-    setTimeout(()=>{
-      btn.innerHTML = '<span class="clap-icon">🎬</span> Buat Master Prompt';
-    }, 1400);
-    
-    document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    document.getElementById('scriptPaper').scrollTop = 0;
-  });
-
-  copyBtn.addEventListener('click', async ()=>{
-    if(output.style.display === 'none'){ btn.click(); }
-    const text = output.textContent;
-    if(!text) return;
-    try{
-      await navigator.clipboard.writeText(text);
-      copyBtn.textContent = '✅ Tersalin!';
-      copyBtn.classList.add('copied');
-      setTimeout(()=>{ copyBtn.textContent = '📋 Salin'; copyBtn.classList.remove('copied'); }, 1600);
-    }catch(e){
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
-      copyBtn.textContent = '✅ Tersalin!';
-      copyBtn.classList.add('copied');
-      setTimeout(()=>{ copyBtn.textContent = '📋 Salin'; copyBtn.classList.remove('copied'); }, 1600);
+  // ===================== PROMPT BUILDERS =====================
+  function getPedagogyStructure(jenis){
+    switch(jenis){
+      case 'Video Eksperimen':
+        return 'Alur Wajib Eksperimen: Setup Alat & Bahan → Hipotesis Awal → Langkah Prosedur → Pengamatan/Observasi → Hasil & Reaksi Sains → Penjelasan Ilmiah & Kesimpulan.';
+      case 'Video Demonstrasi':
+        return 'Alur Wajib Demonstrasi: Pengenalan Objek/Alat → Demonstrasi Bertahap → Poin Kritis/Safety → Visualisasi Hasil Nyata → Tips Evaluasi.';
+      case 'Video Storytelling':
+        return 'Alur Wajib Storytelling: Visual Hook Menarik → Munculnya Masalah/Konflik → Petualangan/Eksplorasi Mencari Jawaban → Resolusi Pemahaman Konsep → Refleksi Makna.';
+      case 'Video Prosedur / Tutorial':
+        return 'Alur Wajib Prosedur: Overview Tujuan → Langkah 1, 2, 3 secara terurut dan presisi → Kesalahan Umum yang Harus Dihindari → Hasil Akhir Sempurna.';
+      case 'Video Studi Kasus':
+        return 'Alur Wajib Studi Kasus: Pemaparan Fenomena Nyata → Identifikasi Masalah Utama → Analisis Faktor Penyebab → Solusi Berbasis Materi → Pelajaran Penting.';
+      case 'Video Problem-Based Learning':
+        return 'Alur Wajib PBL: Pertanyaan Pemantik / Masalah Nyata → Investigasi Fakta → Pengujian Konsep → Pemecahan Masalah → Sintesis Konsep.';
+      case 'Video Motivasi / Pengantar':
+        return 'Alur Wajib Motivasi: Hook Emosional / Fakta Mencengangkan → Relevansi Materi dengan Masa Depan Siswa → Kilasan Materi Menarik → Ajakan Belajar Penuh Semangat.';
+      case 'Video Review / Rangkuman':
+        return 'Alur Wajib Review: Kilas Balik Poin Inti 1, 2, 3 → Analogi Singkat Penyatu Konsep → Pertanyaan Refleksi/Kuis Cepat Pemahaman.';
+      case 'Video Konsep':
+      default:
+        return 'Alur Wajib Konsep: Visual Hook → Pertanyaan Pemantik → Definisi Intuitif & Analogi Sehari-hari → Eksplorasi Visual Konsep → Contoh Aplikasi Nyata → Kesimpulan.';
     }
+  }
+
+  function getSharedContext(){
+    const judul = val('judul');
+    const mapel = val('mapel');
+    const kelas = val('kelas');
+    const jenisVideo = selVal('jenisVideo');
+    const durasi = selVal('durasi');
+    const bahasa = selVal('bahasa');
+    const materi = val('materi');
+    const tujuan = val('tujuan');
+    const gayaVisual = selVal('gayaVisual');
+    const jenisAnimasi = selVal('jenisAnimasi');
+    const ratio = selVal('ratio');
+    const resolusi = selVal('resolusi');
+    const dinamikaLatar = selVal('dinamikaLatar');
+    const lokasi = selVal('lokasi');
+    const suasana = selVal('suasana');
+    const emosi = selVal('emosi');
+    const opsiPopup = selVal('opsiPopup');
+
+    const optKar = opsiKarakter.value;
+    let karakterDesc = "";
+    if(optKar === 'none') karakterDesc = "TIDAK ADA KARAKTER DI LAYAR (Video fokus visual objek, latar, eksperimen, atau infografis).";
+    else if(optKar === 'ai') karakterDesc = "Diserahkan ke AI untuk merancang karakter yang relevan dan ramah bagi siswa.";
+    else {
+      karakterDesc = val('tokoh') || "Karakter guru/tokoh utama materi.";
+      if(useRefImage.checked) karakterDesc += " [CATATAN: Wajah karakter WAJIB mereferensikan foto yang dilampirkan oleh pengguna di chat].";
+    }
+
+    let audioList = [];
+    if(document.getElementById('audioBGM').checked) audioList.push("Background Music (BGM)");
+    if(document.getElementById('audioSFX').checked) audioList.push("Sound Effects (SFX)");
+    if(audioVoice.checked){
+      const isAI = suaraEl.value.indexOf('AI') === 0;
+      audioList.push(isAI ? `Narasi Voice Over AI (${selVal('voiceGender')})` : "Narasi Manual oleh Guru");
+    }
+    const audioDesc = audioList.length > 0 ? audioList.join(" + ") : "Visual murni tanpa audio";
+
+    return {
+      judul, mapel, kelas, jenisVideo, durasi, bahasa, materi, tujuan,
+      gayaVisual, jenisAnimasi, ratio, resolusi, dinamikaLatar,
+      lokasi, suasana, emosi, optKar, karakterDesc, audioDesc, opsiPopup
+    };
+  }
+
+  function buildPrompt1(ctx){
+    const pedaStructure = getPedagogyStructure(ctx.jenisVideo);
+
+    return `# TAHAP 1: STORYBOARD MASTER & SCRIPT BREAKDOWN\nAnda adalah seorang **AI Video Production Director** dan **Instructional Designer** kelas dunia.\nTugas Anda adalah merancang naskah dan alur adegan (Storyboard Master) untuk video pembelajaran jenis **${ctx.jenisVideo}** yang sangat engaging, runtut, dan mudah dipahami siswa.\n\n## INFORMASI VIDEO:\n- Judul Video: ${ctx.judul}\n- Mata Pelajaran: ${ctx.mapel}\n- Kelas & Jenjang: ${ctx.kelas}\n- Jenis Video: ${ctx.jenisVideo}\n- Target Total Durasi: ${ctx.durasi}\n- Materi Pokok: ${ctx.materi}\n- Tujuan Pembelajaran: ${ctx.tujuan}\n- Gaya Visual & Animasi: ${ctx.gayaVisual} (${ctx.jenisAnimasi})\n- Suasana & Target Emosi: ${ctx.suasana} | ${ctx.emosi}\n- Dinamika Latar & Lokasi: ${ctx.dinamikaLatar} | ${ctx.lokasi}\n- Karakter: ${ctx.karakterDesc}\n- Pengaturan Audio: ${ctx.audioDesc}\n\n## ALUR STRUKTUR PEDAGOGIS KHUSUS:\n${pedaStructure}\n\n## ATURAN MUTLAK STORYBOARD & PACING:\n1. **Perhitungan Total Durasi & Scene:** Sesuaikan total adegan dengan target durasi ${ctx.durasi}.\n2. **Durasi Scene Fleksibel & Alami:** Jangan mengunci kaku seluruh scene pada 8 detik. Gunakan variasi pacing:\n   - Scene Visual / Transisi / Hook: 4–6 detik\n   - Scene Penjelasan Dialog Normal: 6–8 detik\n   - Scene Demonstrasi / Visualisasi Eksperimen: 8–10 detik\n3. **Standar Kecepatan Narasi (WPM):** Gunakan standar narasi guru yang jelas dan tenang (120–135 kata per menit, atau ~2 kata per detik). Panjang naskah narasi WAJIB menyesuaikan durasi adegan:\n   - Scene 4–5 detik: Maksimal 8–10 kata\n   - Scene 6–7 detik: Maksimal 12–14 kata\n   - Scene 8–10 detik: Maksimal 16–20 kata\n4. **Visual Hook:** Scene 1 WAJIB menjadi Visual Hook yang memicu rasa ingin tahu siswa dalam 3 detik pertama sebelum teori dimulai.\n5. **Bahasa:** Seluruh naskah narasi ditulis dalam **${ctx.bahasa}**.\n\n## FORMAT OUTPUT WAJIB (Tabel):\nTampilkan output HANYA dalam format tabel berikut:\n\n| Scene | Durasi | Latar / Setting | Visual & Aksi Karakter | Naskah Narasi / Dialog (Disesuaikan WPM) | Transisi |\n\nSetelah tabel selesai, berhenti dan tunggu instruksi Tahap 2.`;
+  }
+
+  function buildPrompt2(ctx){
+    return `# TAHAP 2: PROMPT ADAPTIVE STORYBOARD GRID / REFERENCE SHEET\nBerdasarkan Storyboard pada Tahap 1 yang telah Anda buat, sekarang bertindaklah sebagai **Lead Concept Artist & Art Director**.\n\nTugas Anda adalah membuat SATU prompt gambar komprehensif dalam Bahasa Inggris untuk menghasilkan **Adaptive Storyboard Grid Image** atau **Character & Environment Reference Sheet** guna mengunci konsistensi gaya visual, karakter, dan latar.\n\n## PANDUAN ADAPTIVE GRID:\n- Sesuaikan susunan kisi gambar dengan jumlah scene di Tahap 1 (misal: 4 scene = 2x2 grid; 6 scene = 2x3 grid; 9 scene = 3x3 grid; >10 scene = Character Reference Sheet + Environment Reference Sheet + Core Storyboard Panel).\n\n## ATURAN PROMPT GAMBAR:\n- Gaya Visual: ${ctx.gayaVisual} (${ctx.resolusi}, aspect ratio ${ctx.ratio})\n- Karakter: ${ctx.karakterDesc}\n- Latar: ${ctx.lokasi} (${ctx.dinamikaLatar})\n- Wajib menyertakan komposisi visual berurutan yang merefleksikan alur video ${ctx.jenisVideo}.\n- **DILARANG KERAS MENAMPILKAN TEKS/TULISAN:** Cantumkan negative prompt "no text, no letters, no subtitles, no watermark, no speech bubbles" agar panel gambar bersih dari tulisan yang rusak.\n\n## FORMAT OUTPUT:\nJelaskan rekomendasi susunan grid (misal: 2x3 Grid Panel), lalu berikan:\n\n====================================\nMASTER GRID / REFERENCE SHEET PROMPT (English):\n[Satu paragraf prompt komprehensif dalam Bahasa Inggris siap pakai untuk Midjourney / DALL-E / Imagen 3 yang mendeskripsikan kisi panel visual adegan bersambung]\n\nNegative Prompt:\nno text, no letters, no typography, no subtitles, no speech bubbles, no watermarks, no distorted anatomy.\n====================================\n\nSetelah selesai, tunggu instruksi Tahap 3.`;
+  }
+
+  function buildPrompt3(ctx){
+    const charConsistency = (ctx.optKar !== 'none') 
+      ? `For Scene 2 and onwards: "Maintain identical character appearance, clothing, hairstyle, facial features, lighting, and rendering style (${ctx.gayaVisual}) as established in previous scenes. The composition should serve as a seamless continuation of the previous scene's final frame."`
+      : `For Scene 2 and onwards: "Maintain identical environment layout, color palette, lighting, and visual rendering style (${ctx.gayaVisual}) as established in previous scenes."`;
+
+    return `# TAHAP 3: PROMPT GAMBAR DETAIL PER SCENE (100% CLEAN / NO-TEXT)\nSekarang bertindaklah sebagai **Lead Cinematographer & Concept Illustrator**.\nUraikan setiap Scene dari Storyboard Tahap 1 menjadi prompt gambar individu beresolusi tinggi untuk AI Image Generator (Midjourney / DALL-E 3 / Imagen 3).\n\n## ATURAN MUTLAK TAHAP 3 (ANTI-TEKS PADA GAMBAR):\n1. **GAMBAR HARUS 100% BERSIH DARI TEKS:** Jangan pernah memasukkan teks rumus, judul materi, label nama, atau watermark ke dalam prompt gambar. Gambar ini adalah asset visual mentah (clean background/action). Teks edukasi baru akan ditambahkan pada tahap video/editing!\n2. **Leave Empty Space:** Pastikan komposisi gambar menyisakan ruang kosong yang cukup (rule of thirds) untuk penempatan grafis pop-up nantinya di video.\n3. **Konsistensi Visual:**\n   ${charConsistency}\n\n## FORMAT OUTPUT PER SCENE (JANGAN GUNAKAN TABEL):\nGunakan blok format berikut untuk setiap scene:\n\n====================================\nSCENE [Nomor Scene]\n\nPurpose:\n[Tujuan visual edukatif scene ini]\n\nDuration & Aspect Ratio:\n[Durasi scene dari Storyboard Tahap 1] | [${ctx.ratio}]\n\nFinal Image Prompt (English):\n[Satu paragraf prompt detail dalam Bahasa Inggris: Angle kamera, pencahayaan, posisi karakter, aksi spesifik, ruang kosong untuk grafis, gaya ${ctx.gayaVisual}. Tidak ada teks.]\n\nNegative Prompt:\nno text, no typography, no watermarks, no words, no letters, no floating labels, no blurry details, no extra limbs.\n====================================\n\nKerjakan seluruh scene secara lengkap, lalu tunggu instruksi Tahap 4.`;
+  }
+
+  function buildPrompt4(ctx){
+    const dialogLogic = ctx.audioDesc.includes("Narasi")
+      ? `Dialogue / Voice Instruction:\nIf AI Voice: The character/narrator speaks in natural Indonesian with an engaging educational tone: "[Tuliskan kalimat narasi Scene ini dari Storyboard Tahap 1]"\nIf Manual Dubbing: No dialogue. No voice audio.`
+      : `Dialogue / Voice Instruction:\nNo dialogue. No voice audio. Visual only.`;
+
+    return `# TAHAP 4: PROMPT ANIMASI VIDEO (MOTION CONTINUITY & POP-UP SUTRADARA)\nSekarang bertindaklah sebagai **Animation Director & Motion Designer**.\nBuatlah Prompt Animasi Video (Image-to-Video) untuk setiap gambar pada Tahap 3 menggunakan AI Video Generator (Kling AI, Gemini Video/Veo, Runway Gen-3, Luma Dream Machine).\n\n## ATURAN MOTION CONTINUITY (3 FASE PER GERAKAN):\nSetiap video wajib mengikuti prinsip alur gerak:\n1. **STILL START (~1 detik pertama):** Gambar awal stabil persis mengikuti gambar referensi Tahap 3 tanpa sentakan mendadak.\n2. **MAIN ACTION:** Aksi edukasi utama dan animasi grafis terjadi secara halus, bertahap, dan alami.\n3. **MOTION HOLD (~1.5 detik terakhir):** Gerakan karakter dan kamera melambat secara natural menuju posisi stabil (Hold Frame) agar transisi ke scene berikutnya terasa mulus dan tidak 'melompat'.\n\n## ATURAN GRAFIS & POP-UP EDUKASI:\n- Instruksi Pop-up: ${ctx.opsiPopup}\n- **BAHASA TEKS POP-UP:** Jika memunculkan keyword, label animasi, atau diagram, teks tersebut WAJIB ditulis dalam **${ctx.bahasa.toUpperCase()}**.\n\n## FORMAT OUTPUT PER SCENE (JANGAN GUNAKAN TABEL):\nGunakan format blok sutradara berikut untuk setiap scene:\n\n====================================\nSCENE [Nomor Scene]\n\nOpening Frame:\nUse the generated image from Scene [Nomor Scene] as the exact opening frame. Start with a stable composition (Still Start for ~1 second). Maintain complete visual consistency.\n\nLearning Goal:\n[Tujuan adegan ini]\n\nScene Action & Motion:\n[Deskripsi aksi pergerakan karakter/kamera secara bertahap dan natural]\n\nEducational Enhancement & Pop-ups:\n[Instruksi kemunculan grafis/panah/diagram/keyword edukasi dalam ${ctx.bahasa}. Jika visual murni, tulis "None"]\n\nMotion Continuity & Hold Frame:\nDuring the final ~1.5 seconds, gradually reduce all movements and settle into a stable, natural hold frame for smooth transition to the next scene.\n\n${dialogLogic}\n\nTechnical Specifications:\nDuration: [Durasi scene dari Storyboard Tahap 1] | Aspect Ratio: ${ctx.ratio} | Style: ${ctx.jenisAnimasi} | Smooth natural motion.\n====================================\n\nKerjakan seluruh scene hingga selesai.`;
+  }
+
+  // ===================== GENERATE & TAB HANDLER =====================
+  const generateBtn = document.getElementById('generateBtn');
+  const outputCol = document.getElementById('outputCol');
+  const emptyState = document.getElementById('emptyState');
+  const outputContainer = document.getElementById('outputContainer');
+  const stageNavTabs = document.getElementById('stageNavTabs');
+
+  generateBtn.addEventListener('click', ()=>{
+    if(!validateForm()) return;
+
+    const ctx = getSharedContext();
+    const chk1 = document.getElementById('chkTahap1').checked;
+    const chk2 = document.getElementById('chkTahap2').checked;
+    const chk3 = document.getElementById('chkTahap3').checked;
+    const chk4 = document.getElementById('chkTahap4').checked;
+
+    if(!chk1 && !chk2 && !chk3 && !chk4){
+      const banner = document.getElementById('validationBanner');
+      banner.classList.add('show');
+      document.getElementById('validationMsg').textContent = "Pilihlah minimal satu tahapan output pada Bagian 04!";
+      return;
+    }
+
+    // Populate stage text
+    document.getElementById('outTahap1').textContent = chk1 ? buildPrompt1(ctx) : '';
+    document.getElementById('boxTahap1').classList.toggle('show', chk1);
+    document.getElementById('tabBtn1').style.display = chk1 ? 'inline-block' : 'none';
+
+    document.getElementById('outTahap2').textContent = chk2 ? buildPrompt2(ctx) : '';
+    document.getElementById('boxTahap2').classList.toggle('show', chk2);
+    document.getElementById('tabBtn2').style.display = chk2 ? 'inline-block' : 'none';
+
+    document.getElementById('outTahap3').textContent = chk3 ? buildPrompt3(ctx) : '';
+    document.getElementById('boxTahap3').classList.toggle('show', chk3);
+    document.getElementById('tabBtn3').style.display = chk3 ? 'inline-block' : 'none';
+
+    document.getElementById('outTahap4').textContent = chk4 ? buildPrompt4(ctx) : '';
+    document.getElementById('boxTahap4').classList.toggle('show', chk4);
+    document.getElementById('tabBtn4').style.display = chk4 ? 'inline-block' : 'none';
+
+    emptyState.style.display = 'none';
+    outputContainer.style.display = 'flex';
+    stageNavTabs.style.display = 'flex';
+
+    // Reset active tab to 'all'
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('.tab-btn[data-tab="all"]').classList.add('active');
+    document.querySelectorAll('.stage-box').forEach(box => box.classList.remove('is-hidden-by-tab'));
+
+    // Button feedback
+    generateBtn.innerHTML = '✅ Prompts Siap!';
+    setTimeout(()=>{
+      generateBtn.innerHTML = '<span class="clap-icon">🎬</span> Generate Prompts';
+    }, 1600);
+
+    // Scroll smoothly to output
+    outputCol.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 
-  downloadBtn.addEventListener('click', ()=>{
-    if(output.style.display === 'none'){ btn.click(); }
-    const text = output.textContent;
+  // Tab switching logic
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const target = btn.getAttribute('data-tab');
+      if (target === 'all') {
+        document.querySelectorAll('.stage-box').forEach(box => {
+          box.classList.remove('is-hidden-by-tab');
+        });
+      } else {
+        document.querySelectorAll('.stage-box').forEach(box => {
+          if (box.id === target) {
+            box.classList.remove('is-hidden-by-tab');
+          } else {
+            box.classList.add('is-hidden-by-tab');
+          }
+        });
+      }
+      outputContainer.scrollTop = 0;
+    });
+  });
+
+  // ===================== COPY & DOWNLOAD HANDLERS =====================
+  function copyTextToClipboard(text, btnElement){
     if(!text) return;
-    const judul = (document.getElementById('judul').value.trim() || 'prompt-video').replace(/[^a-z0-9]+/gi,'-').toLowerCase();
-    const blob = new Blob([text], {type:'text/plain'});
+    const onSuccess = ()=>{
+      const originalText = btnElement.textContent;
+      btnElement.textContent = '✅ Tersalin!';
+      btnElement.classList.add('copied');
+      setTimeout(()=>{
+        btnElement.textContent = originalText;
+        btnElement.classList.remove('copied');
+      }, 1500);
+    };
+
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(onSuccess).catch(()=>{
+        fallbackCopy(text, onSuccess);
+      });
+    } else {
+      fallbackCopy(text, onSuccess);
+    }
+  }
+
+  function fallbackCopy(text, cb){
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+      document.execCommand('copy');
+      if(cb) cb();
+    } catch (err) {
+      console.error('Fallback copy error', err);
+    }
+    document.body.removeChild(ta);
+  }
+
+  // Copy individual stage
+  document.querySelectorAll('.btn-copy-stage').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const targetId = btn.getAttribute('data-target');
+      const text = document.getElementById(targetId).textContent;
+      copyTextToClipboard(text, btn);
+    });
+  });
+
+  // Copy All stages
+  const copyAllBtn = document.getElementById('copyAllBtn');
+  copyAllBtn.addEventListener('click', ()=>{
+    if(outputContainer.style.display === 'none'){ generateBtn.click(); }
+    const stages = ['outTahap1', 'outTahap2', 'outTahap3', 'outTahap4'];
+    const combined = stages
+      .map(id => document.getElementById(id).textContent)
+      .filter(Boolean)
+      .join('\n\n' + '='.repeat(60) + '\n\n');
+      
+    if(combined) copyTextToClipboard(combined, copyAllBtn);
+  });
+
+  // Download .TXT
+  const downloadTxtBtn = document.getElementById('downloadTxtBtn');
+  downloadTxtBtn.addEventListener('click', ()=>{
+    if(outputContainer.style.display === 'none'){ generateBtn.click(); }
+    const stages = ['outTahap1', 'outTahap2', 'outTahap3', 'outTahap4'];
+    const combined = stages
+      .map(id => document.getElementById(id).textContent)
+      .filter(Boolean)
+      .join('\n\n' + '='.repeat(60) + '\n\n');
+
+    if(!combined) return;
+    const titleSlug = (val('judul') || 'prompt-video-pembelajaran').replace(/[^a-z0-9]+/gi, '-').toLowerCase();
+    const blob = new Blob([combined], { type: 'text/plain;charset=utf-8' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `master-prompt-${judul}.txt`;
+    a.download = `chain-prompt-${titleSlug}.txt`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(a.href);
   });
 
-  function buildWorkbook(promptText){
-    const wb = XLSX.utils.book_new();
-
-    function addSheet(name, aoa, widths){
-      const ws = XLSX.utils.aoa_to_sheet(aoa);
-      if(widths) ws['!cols'] = widths.map(w=>({wch:w}));
-      XLSX.utils.book_append_sheet(wb, ws, name);
-    }
-    function blankRows(n, cols){
-      const arr = [];
-      for(let i=1;i<=n;i++){
-        const row = [String(i)];
-        for(let c=1;c<cols;c++) row.push('');
-        arr.push(row);
-      }
-      return arr;
-    }
-
-    const optKar = document.getElementById('opsiKarakter').value;
-    let tokohStatus = "";
-    if(optKar === 'none') tokohStatus = "TIDAK ADA KARAKTER DI LAYAR";
-    else if(optKar === 'ai') tokohStatus = "Bebas diserahkan ke AI";
-    else tokohStatus = textVal('tokoh') + (document.getElementById('useRefImage').checked ? ' (Menggunakan lampiran foto referensi)' : '');
-
-    // Sheet 1 — Master Prompt in one big cell
-    addSheet('1. Master Prompt', [
-      ['TIPS: Klik 2x (double-click) pada cell di bawah ini untuk menyorot seluruh teks, lalu tekan Ctrl+C (Copy). Paste (Ctrl+V) ke ChatGPT / Gemini.'],
-      [promptText]
-    ], [150]);
-
-    // Sheet 2 — Konsep Video
-    addSheet('2. Konsep Video', [
-      ['Komponen','Isi'],
-      ['Judul Video', textVal('judul')],
-      ['Mata Pelajaran', textVal('mapel')],
-      ['Jenjang', selVal('jenjang')],
-      ['Bahasa Teks & Pop-up', selVal('bahasa')],
-      ['Kelas', textVal('kelas')],
-      ['Materi', textVal('materi')],
-      ['Tujuan Pembelajaran', textVal('tujuan')],
-      ['Durasi Video', textVal('durasi')],
-      ['Target Penonton', textVal('target','Menyesuaikan jenjang siswa')],
-      ['Platform', selVal('platform')],
-      ['Aspect Ratio', selVal('ratio')],
-      ['Resolusi', selVal('resolusi')],
-      ['Gaya Visual', selVal('gayaVisual')],
-      ['Jenis Animasi', selVal('jenisAnimasi')],
-      ['Target Emosi Penonton', selVal('emosi')],
-      ['Bentuk Video', selVal('bentuk')],
-      ['Suasana Video', selVal('suasana')],
-      ['Lokasi Cerita', selVal('lokasi')],
-      ['Karakter Utama', tokohStatus]
-    ], [26, 60]);
-
-    // Sheet 3 — Storyboard
-    addSheet('3. Storyboard', [
-      ['Scene','Durasi','Visual (tempel dari AI)','Narasi / Dialog','Transisi'],
-      ...blankRows(15, 5)
-    ], [8, 10, 45, 45, 15]);
-
-    // Sheet 4 — Prompt Image
-    addSheet('4. Prompt Image', [
-      ['Scene','Final Prompt Image (tempel dari AI, copy bagian FINAL PROMPT saja)'],
-      ...blankRows(15, 2)
-    ], [8, 120]);
-
-    // Sheet 5 — Prompt Video
-    addSheet('5. Prompt Video', [
-      ['Scene','Prompt Video Keseluruhan (copy dari blok Scene)'],
-      ...blankRows(15, 2)
-    ], [8, 120]);
-
-    const judulSlug = (textVal('judul') || 'video-pembelajaran').replace(/[^a-z0-9]+/gi,'-').toLowerCase();
-    return { wb, judulSlug };
-  }
-
+  // Excel Export with SheetJS
   const excelBtn = document.getElementById('excelBtn');
   excelBtn.addEventListener('click', ()=>{
-    if(output.style.display === 'none'){ btn.click(); }
-    const originalLabel = excelBtn.textContent;
+    if(outputContainer.style.display === 'none'){ generateBtn.click(); }
+    const originalText = excelBtn.textContent;
     try{
-      const text = output.textContent; 
-      const { wb, judulSlug } = buildWorkbook(text); 
-      XLSX.writeFile(wb, `template-video-${judulSlug}.xlsx`);
+      const ctx = getSharedContext();
+      const wb = XLSX.utils.book_new();
+
+      function addSheet(name, aoa, widths){
+        const ws = XLSX.utils.aoa_to_sheet(aoa);
+        if(widths) ws['!cols'] = widths.map(w=>({wch:w}));
+        XLSX.utils.book_append_sheet(wb, ws, name);
+      }
+
+      // Sheet 1: Konsep & Ringkasan
+      addSheet('1. Konsep Video', [
+        ['Komponen', 'Isi Form'],
+        ['Judul Video', ctx.judul],
+        ['Mata Pelajaran', ctx.mapel],
+        ['Kelas & Jenjang', ctx.kelas],
+        ['Jenis Video', ctx.jenisVideo],
+        ['Target Total Durasi', ctx.durasi],
+        ['Bahasa Pop-up', ctx.bahasa],
+        ['Materi Pelajaran', ctx.materi],
+        ['Tujuan Pembelajaran', ctx.tujuan],
+        ['Gaya Visual', ctx.gayaVisual],
+        ['Jenis Animasi', ctx.jenisAnimasi],
+        ['Aspect Ratio', ctx.ratio],
+        ['Resolusi', ctx.resolusi],
+        ['Latar & Lokasi', `${ctx.dinamikaLatar} - ${ctx.lokasi}`],
+        ['Suasana & Emosi', `${ctx.suasana} - ${ctx.emosi}`],
+        ['Karakter', ctx.karakterDesc],
+        ['Audio', ctx.audioDesc]
+      ], [24, 60]);
+
+      // Sheet 2: Master Prompts (Semua Tahap)
+      const p1 = document.getElementById('outTahap1').textContent;
+      const p2 = document.getElementById('outTahap2').textContent;
+      const p3 = document.getElementById('outTahap3').textContent;
+      const p4 = document.getElementById('outTahap4').textContent;
+
+      addSheet('2. Prompt Tahap 1 (Story)', [['Prompt Tahap 1: Storyboard'], [p1 || '(Tidak dipilih)']], [120]);
+      addSheet('3. Prompt Tahap 2 (Grid)', [['Prompt Tahap 2: Grid Panel'], [p2 || '(Tidak dipilih)']], [120]);
+      addSheet('4. Prompt Tahap 3 (Image)', [['Prompt Tahap 3: Scene Images'], [p3 || '(Tidak dipilih)']], [120]);
+      addSheet('5. Prompt Tahap 4 (Video)', [['Prompt Tahap 4: Animation Video'], [p4 || '(Tidak dipilih)']], [120]);
+
+      const titleSlug = (ctx.judul || 'video-pembelajaran').replace(/[^a-z0-9]+/gi, '-').toLowerCase();
+      XLSX.writeFile(wb, `workbook-${titleSlug}.xlsx`);
+      
       excelBtn.textContent = '✅ Terunduh!';
-    }catch(e){
-      excelBtn.textContent = '⚠️ Gagal, coba lagi';
-      console.error(e);
+    }catch(err){
+      console.error(err);
+      excelBtn.textContent = '⚠️ Gagal';
     }
-    setTimeout(()=>{ excelBtn.textContent = originalLabel; }, 1800);
+    setTimeout(()=>{ excelBtn.textContent = originalText; }, 1800);
   });
 
-  updateCount();
-</script>
+  // ===================== RESET MODAL LOGIC =====================
+  const resetBtn = document.getElementById('resetBtn');
+  const resetModal = document.getElementById('resetModal');
+  const cancelResetBtn = document.getElementById('cancelResetBtn');
+  const confirmResetBtn = document.getElementById('confirmResetBtn');
 
+  resetBtn.addEventListener('click', ()=>{ resetModal.classList.add('show'); });
+  cancelResetBtn.addEventListener('click', ()=>{ resetModal.classList.remove('show'); });
+  resetModal.addEventListener('click', (e)=>{ if(e.target === resetModal) resetModal.classList.remove('show'); });
+
+  confirmResetBtn.addEventListener('click', ()=>{
+    // Clear text inputs
+    document.querySelectorAll('input[type=text], textarea').forEach(el=> el.value = '');
+    // Reset selects
+    document.querySelectorAll('select').forEach(el=> el.selectedIndex = 0);
+    // Reset checkboxes
+    document.querySelectorAll('.custom-input').forEach(el=> el.classList.remove('show'));
+    karakterCustomGroup.style.display = 'block';
+    useRefImage.checked = false;
+    refImageNote.style.display = 'none';
+    audioVoice.checked = true;
+    syncAudioUI();
+
+    // Reset stages
+    document.getElementById('chkTahap1').checked = true;
+    document.getElementById('chkTahap2').checked = true;
+    document.getElementById('chkTahap3').checked = true;
+    document.getElementById('chkTahap4').checked = true;
+
+    // Reset errors
+    document.querySelectorAll('.field').forEach(f=> f.classList.remove('has-error'));
+    document.getElementById('validationBanner').classList.remove('show');
+
+    // Reset output
+    outputContainer.style.display = 'none';
+    stageNavTabs.style.display = 'none';
+    emptyState.style.display = 'flex';
+    document.querySelectorAll('.stage-box pre').forEach(el=> el.textContent = '');
+
+    resetModal.classList.remove('show');
+    updateFieldCount();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // ===================== TUTORIAL MODAL LOGIC =====================
+  const tutorialModal = document.getElementById('tutorialModal');
+  const openTutorial = document.getElementById('openTutorial');
+  const closeTutorial = document.getElementById('closeTutorial');
+
+  openTutorial.addEventListener('click', ()=>{ tutorialModal.classList.add('show'); });
+  closeTutorial.addEventListener('click', ()=>{ tutorialModal.classList.remove('show'); });
+  tutorialModal.addEventListener('click', (e)=>{ if(e.target === tutorialModal) tutorialModal.classList.remove('show'); });
+</script>
 </body>
 </html>
